@@ -1,0 +1,63 @@
+# Base image for all MCP nodes
+FROM rust:1.75-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache musl-dev openssl-dev
+
+# Create app directory
+WORKDIR /app
+
+# Copy Rust project files
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+
+# Build release binary
+RUN cargo build --release
+
+# Runtime stage
+FROM alpine:latest
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    openssl \
+    nodejs \
+    npm
+
+# φ constants as environment variables
+ENV PHI=1.618033988749895 \
+    PSI=0.618033988749894 \
+    LN_PHI=0.4812118250 \
+    VALIDATION_STYLE=hawking-radiation \
+    BUSHIDO_MODE=seven-streams
+
+# Create app user
+RUN addgroup -g 1000 phi && \
+    adduser -D -u 1000 -G phi phi
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/target/release/mcp-phi-base /app/
+
+# Copy JavaScript validators
+COPY validators /app/validators
+COPY visualizers /app/visualizers
+
+# Install Node dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Create data directories
+RUN mkdir -p /data /logs /cache && \
+    chown -R phi:phi /app /data /logs /cache
+
+USER phi
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "process.exit(0)" || exit 1
+
+# Default command (overridden by specific node types)
+CMD ["./mcp-phi-base"]

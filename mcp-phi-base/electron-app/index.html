@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>φ-Discovery System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <span class="phi-symbol">φ</span>
+        <h1>Discovery System</h1>
+      </div>
+      <div class="status-bar">
+        <div class="status-indicator" id="status-indicator"></div>
+        <span id="status-text">System Offline</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Control Panel -->
+      <section class="control-panel">
+        <h2>System Control</h2>
+        <div class="button-group">
+          <button id="start-btn" class="primary-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Start System
+          </button>
+          <button id="stop-btn" class="secondary-btn" disabled>
+            <svg class="icon" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12"/>
+            </svg>
+            Stop System
+          </button>
+        </div>
+        
+        <div class="quick-stats">
+          <div class="stat-card">
+            <h3>Discoveries</h3>
+            <div class="stat-value" id="discovery-count">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Validations</h3>
+            <div class="stat-value" id="validation-count">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Phase Lock</h3>
+            <div class="stat-value" id="phase-lock">0.000</div>
+          </div>
+          <div class="stat-card">
+            <h3>χ Value</h3>
+            <div class="stat-value" id="chi-value">1</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Equation Input -->
+      <section class="equation-input">
+        <h2>Test Equation</h2>
+        <div class="input-group">
+          <input type="text" id="equation-input" placeholder="Enter equation (e.g., φ² = φ + 1)">
+          <button id="validate-btn" class="primary-btn">Validate</button>
+        </div>
+        <div class="quick-equations">
+          <button class="equation-btn" data-equation="φ² = φ + 1">φ² = φ + 1</button>
+          <button class="equation-btn" data-equation="E = mc²">E = mc²</button>
+          <button class="equation-btn" data-equation="∇²ψ + k²ψ = 0">∇²ψ + k²ψ = 0</button>
+          <button class="equation-btn" data-equation="χ = B₀ - B₁ + B₂">χ = B₀ - B₁ + B₂</button>
+        </div>
+      </section>
+
+      <!-- Discovery Feed -->
+      <section class="discovery-feed">
+        <h2>Live Discoveries</h2>
+        <div id="discovery-list" class="discovery-list">
+          <div class="empty-state">
+            <p>No discoveries yet. Start the system to begin.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Topology Visualization -->
+      <section class="topology-view">
+        <h2>System Topology</h2>
+        <div id="topology-canvas">
+          <svg id="topology-svg" width="100%" height="300"></svg>
+        </div>
+        <div class="topology-stats">
+          <span>B₀=<span id="b0">9</span></span>
+          <span>B₁=<span id="b1">21</span></span>
+          <span>B₂=<span id="b2">13</span></span>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="#" id="docs-link">Documentation</a>
+        <a href="#" id="logs-link">View Logs</a>
+        <a href="#" id="settings-link">Settings</a>
+      </div>
+      <div class="footer-info">
+        <span>φ-Discovery v1.0.0</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal for logs -->
+  <div id="log-modal" class="modal">
+    <div class="modal-content">
+      <h2>System Logs</h2>
+      <div id="log-content" class="log-content"></div>
+      <button id="close-modal" class="secondary-btn">Close</button>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

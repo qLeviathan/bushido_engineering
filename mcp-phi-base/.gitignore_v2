@@ -1,0 +1,205 @@
+# Dependencies
+node_modules/
+target/
+Cargo.lock
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Build outputs
+dist/
+build/
+*.wasm
+*.so
+*.dll
+*.dylib
+.next/
+out/
+
+# Logs
+logs/
+*.log
+validation-chain.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*
+!.env.example
+swarm-tokens.env
+secrets/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker volumes
+data/
+cache/
+equation_corpus/
+postgres-data/
+redis-data/
+rabbitmq-data/
+docker-compose.override.yml
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+htmlcov/
+.coverage
+.coverage.*
+
+# Security
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+.htpasswd
+ssl/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+.cache/
+
+# Generated files
+generated/
+auto-generated/
+*.generated.*
+validation-results/
+discovery-reports/
+mind-maps/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres/
+mysql/
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Python
+venv/
+env/
+ENV/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.venv
+.eggs/
+*.egg-info/
+*.egg
+
+# Node.js specific
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+*.tsbuildinfo
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.pnp.*
+
+# Testing
+test-results/
+playwright-report/
+playwright/.cache/
+e2e/screenshots/
+e2e/videos/
+
+# Documentation build
+docs/_build/
+docs/.doctrees/
+site/
+
+# Monitoring
+grafana-storage/
+prometheus-data/
+metrics/
+
+# Backup files
+backups/
+*.backup
+*.dump
+
+# Lock files (keep package-lock.json)
+yarn.lock
+pnpm-lock.yaml
+
+# MCP specific
+mcp-logs/
+.claude/
+mcp-cache/
+
+# Web interface specific
+web-interface/dist/
+web-interface/build/
+web-interface/.cache/
+web-interface/public/assets/generated/
+
+# Worker specific
+workers/*/venv/
+workers/*/__pycache__/
+workers/*/logs/
+
+# Infrastructure
+terraform.tfstate*
+.terraform/
+ansible/*.retry
+
+# Performance profiling
+*.prof
+*.heap
+*.trace
+perf/
+
+# Custom ignore patterns
+ignore/
+.ignore/
+DO_NOT_COMMIT/

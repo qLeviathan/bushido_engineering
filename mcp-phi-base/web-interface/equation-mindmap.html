@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>φ-Discovery | Equation Mind Map</title>
+    <style>
+        :root {
+            --bg-primary: #0a192f;
+            --bg-secondary: #112240;
+            --bg-tertiary: #1a2744;
+            --accent-primary: #FFD700;
+            --accent-secondary: #4d96ff;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --text-dim: #495670;
+            --border-color: rgba(255, 215, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+            --success-color: #64ffda;
+            --error-color: #ff6b6b;
+            
+            /* Archetype colors */
+            --mechanics-color: #ff6b6b;
+            --quantum-color: #4ecdc4;
+            --relativity-color: #a8e6cf;
+            --thermodynamics-color: #ffd93d;
+            --electromagnetism-color: #95e1d3;
+            --topology-color: #c7ceea;
+            --golden-ratio-color: #FFD700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+        }
+        
+        .legend-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+        }
+        
+        .control-item {
+            margin-bottom: 10px;
+        }
+        
+        .control-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+        
+        .control-value {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* Canvas */
+        #mindMapCanvas {
+            background: var(--bg-primary);
+            cursor: grab;
+        }
+        
+        #mindMapCanvas:active {
+            cursor: grabbing;
+        }
+        
+        /* Info Panel */
+        .info-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 300px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 200;
+        }
+        
+        .info-panel.show {
+            opacity: 1;
+        }
+        
+        .info-equation {
+            font-family: "Times New Roman", serif;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        
+        .info-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .info-details div {
+            margin-bottom: 8px;
+        }
+        
+        .info-details span {
+            color: var(--accent-primary);
+        }
+        
+        .validate-btn {
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        /* Search */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            width: 200px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Stats */
+        .stats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .stats-item {
+            margin-bottom: 5px;
+        }
+        
+        .stats-value {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">
+            <span>φ-Discovery</span>
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">Equation Mind Map</span>
+        </div>
+        
+        <div class="header-actions">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search equations..."
+                    onkeyup="searchEquations(event)"
+                />
+            </div>
+            <button class="btn" onclick="resetView()">Reset View</button>
+            <button class="btn" onclick="toggleAnimation()">Toggle Animation</button>
+            <button class="btn" onclick="exportMap()">Export</button>
+            <button class="btn" onclick="window.location.href='index.html'">Back to Discovery</button>
+        </div>
+    </div>
+    
+    <canvas id="mindMapCanvas"></canvas>
+    
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-title">Archetypes</div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--mechanics-color)"></div>
+            <span>Mechanics</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--quantum-color)"></div>
+            <span>Quantum</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--relativity-color)"></div>
+            <span>Relativity</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--thermodynamics-color)"></div>
+            <span>Thermodynamics</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--electromagnetism-color)"></div>
+            <span>Electromagnetism</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--topology-color)"></div>
+            <span>Topology</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: var(--golden-ratio-color)"></div>
+            <span>Golden Ratio</span>
+        </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <div class="control-item">
+            <div class="control-label">Force Strength</div>
+            <div class="control-value">
+                <input 
+                    type="range" 
+                    id="forceStrength" 
+                    min="0" 
+                    max="100" 
+                    value="50"
+                    oninput="updateForceStrength(this.value)"
+                />
+                <span id="forceValue">50</span>
+            </div>
+        </div>
+        <div class="control-item">
+            <div class="control-label">Link Distance</div>
+            <div class="control-value">
+                <input 
+                    type="range" 
+                    id="linkDistance" 
+                    min="50" 
+                    max="300" 
+                    value="150"
+                    oninput="updateLinkDistance(this.value)"
+                />
+                <span id="linkValue">150</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Info Panel -->
+    <div class="info-panel" id="infoPanel">
+        <div class="info-equation" id="infoEquation"></div>
+        <div class="info-details" id="infoDetails"></div>
+        <button class="btn validate-btn" onclick="validateEquation()">Validate Equation</button>
+    </div>
+    
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stats-item">Total Equations: <span class="stats-value" id="totalEquations">0</span></div>
+        <div class="stats-item">Active Connections: <span class="stats-value" id="activeConnections">0</span></div>
+        <div class="stats-item">φ-Coherence: <span class="stats-value" id="phiCoherence">0.618</span></div>
+    </div>
+    
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('mindMapCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        
+        // Mind map state
+        let nodes = [];
+        let links = [];
+        let selectedNode = null;
+        let hoveredNode = null;
+        let animationRunning = true;
+        
+        // Physics parameters
+        let forceStrength = 0.5;
+        let linkDistance = 150;
+        let centerForce = 0.01;
+        let repelForce = 1000;
+        
+        // Camera
+        let camera = {
+            x: 0,
+            y: 0,
+            zoom: 1
+        };
+        
+        // Mouse state
+        let mouse = {
+            x: 0,
+            y: 0,
+            down: false,
+            dragStart: null
+        };
+        
+        // Archetypes
+        const archetypes = {
+            mechanics: { color: '#ff6b6b', name: 'Mechanics' },
+            quantum: { color: '#4ecdc4', name: 'Quantum' },
+            relativity: { color: '#a8e6cf', name: 'Relativity' },
+            thermodynamics: { color: '#ffd93d', name: 'Thermodynamics' },
+            electromagnetism: { color: '#95e1d3', name: 'Electromagnetism' },
+            topology: { color: '#c7ceea', name: 'Topology' },
+            goldenRatio: { color: '#FFD700', name: 'Golden Ratio' }
+        };
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initializeNodes();
+            initializeLinks();
+            animate();
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Resize canvas
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            camera.x = width / 2;
+            camera.y = height / 2;
+        }
+        
+        // Initialize nodes with sample equations
+        function initializeNodes() {
+            const equations = [
+                // Mechanics
+                { equation: 'F = ma', archetype: 'mechanics', description: "Newton's Second Law" },
+                { equation: 'E = ½mv²', archetype: 'mechanics', description: 'Kinetic Energy' },
+                { equation: 'p = mv', archetype: 'mechanics', description: 'Momentum' },
+                { equation: 'τ = Iα', archetype: 'mechanics', description: 'Rotational Motion' },
+                
+                // Quantum
+                { equation: 'E = hf', archetype: 'quantum', description: 'Planck-Einstein Relation' },
+                { equation: 'ΔxΔp ≥ ℏ/2', archetype: 'quantum', description: 'Heisenberg Uncertainty' },
+                { equation: 'Ψ(x,t) = Ae^(i(kx-ωt))', archetype: 'quantum', description: 'Wave Function' },
+                { equation: 'Ĥ|ψ⟩ = E|ψ⟩', archetype: 'quantum', description: 'Schrödinger Equation' },
+                
+                // Relativity
+                { equation: 'E = mc²', archetype: 'relativity', description: 'Mass-Energy Equivalence' },
+                { equation: 'ds² = -c²dt² + dx² + dy² + dz²', archetype: 'relativity', description: 'Spacetime Interval' },
+                { equation: 'γ = 1/√(1-v²/c²)', archetype: 'relativity', description: 'Lorentz Factor' },
+                
+                // Thermodynamics
+                { equation: 'PV = nRT', archetype: 'thermodynamics', description: 'Ideal Gas Law' },
+                { equation: 'ΔS ≥ 0', archetype: 'thermodynamics', description: 'Second Law' },
+                { equation: 'dU = TdS - PdV', archetype: 'thermodynamics', description: 'First Law' },
+                
+                // Electromagnetism
+                { equation: '∇·E = ρ/ε₀', archetype: 'electromagnetism', description: "Gauss's Law" },
+                { equation: '∇×B = μ₀J + μ₀ε₀∂E/∂t', archetype: 'electromagnetism', description: "Ampère's Law" },
+                { equation: 'F = q(E + v×B)', archetype: 'electromagnetism', description: 'Lorentz Force' },
+                
+                // Topology
+                { equation: 'χ = V - E + F', archetype: 'topology', description: 'Euler Characteristic' },
+                { equation: '∮_C A·dr = ∬_S (∇×A)·dS', archetype: 'topology', description: "Stokes' Theorem" },
+                
+                // Golden Ratio
+                { equation: 'φ² = φ + 1', archetype: 'goldenRatio', description: 'Golden Ratio Definition' },
+                { equation: 'φ = (1 + √5)/2', archetype: 'goldenRatio', description: 'Golden Ratio Value' },
+                { equation: 'F_n = (φⁿ - ψⁿ)/√5', archetype: 'goldenRatio', description: "Binet's Formula" }
+            ];
+            
+            // Create nodes
+            equations.forEach((eq, index) => {
+                const angle = (index / equations.length) * Math.PI * 2;
+                const radius = 200 + Math.random() * 100;
+                
+                nodes.push({
+                    id: index,
+                    equation: eq.equation,
+                    archetype: eq.archetype,
+                    description: eq.description,
+                    x: camera.x + Math.cos(angle) * radius,
+                    y: camera.y + Math.sin(angle) * radius,
+                    vx: 0,
+                    vy: 0,
+                    radius: 30,
+                    confidence: 0.7 + Math.random() * 0.3,
+                    betti: [
+                        Math.floor(Math.random() * 3) + 1,
+                        Math.floor(Math.random() * 3),
+                        Math.floor(Math.random() * 2)
+                    ]
+                });
+            });
+            
+            updateStats();
+        }
+        
+        // Initialize links between related equations
+        function initializeLinks() {
+            // Connect equations within same archetype
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (nodes[i].archetype === nodes[j].archetype) {
+                        links.push({
+                            source: i,
+                            target: j,
+                            strength: 0.8
+                        });
+                    }
+                }
+            }
+            
+            // Add some cross-archetype connections
+            // E=mc² connects to E=hf
+            addLink('E = mc²', 'E = hf', 0.6);
+            // F=ma connects to F=q(E+v×B)
+            addLink('F = ma', 'F = q(E + v×B)', 0.5);
+            // Energy equations
+            addLink('E = ½mv²', 'E = mc²', 0.7);
+            addLink('E = ½mv²', 'E = hf', 0.5);
+            
+            updateStats();
+        }
+        
+        // Add link between equations
+        function addLink(eq1, eq2, strength) {
+            const node1 = nodes.findIndex(n => n.equation === eq1);
+            const node2 = nodes.findIndex(n => n.equation === eq2);
+            
+            if (node1 !== -1 && node2 !== -1) {
+                links.push({
+                    source: node1,
+                    target: node2,
+                    strength: strength
+                });
+            }
+        }
+        
+        // Physics simulation
+        function updatePhysics() {
+            if (!animationRunning) return;
+            
+            // Apply forces
+            nodes.forEach((node, i) => {
+                // Reset forces
+                node.fx = 0;
+                node.fy = 0;
+                
+                // Center attraction
+                const dx = camera.x - node.x;
+                const dy = camera.y - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    node.fx += dx * centerForce;
+                    node.fy += dy * centerForce;
+                }
+                
+                // Node repulsion
+                nodes.forEach((other, j) => {
+                    if (i !== j) {
+                        const dx = node.x - other.x;
+                        const dy = node.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 0 && dist < 200) {
+                            const force = repelForce / (dist * dist);
+                            node.fx += (dx / dist) * force;
+                            node.fy += (dy / dist) * force;
+                        }
+                    }
+                });
+            });
+            
+            // Apply link forces
+            links.forEach(link => {
+                const source = nodes[link.source];
+                const target = nodes[link.target];
+                
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 0) {
+                    const force = (dist - linkDistance) * link.strength * forceStrength * 0.01;
+                    const fx = (dx / dist) * force;
+                    const fy = (dy / dist) * force;
+                    
+                    source.fx += fx;
+                    source.fy += fy;
+                    target.fx -= fx;
+                    target.fy -= fy;
+                }
+            });
+            
+            // Update velocities and positions
+            nodes.forEach(node => {
+                // Apply forces to velocity with damping
+                node.vx = (node.vx + node.fx) * 0.9;
+                node.vy = (node.vy + node.fy) * 0.9;
+                
+                // Update position
+                if (!node.fixed) {
+                    node.x += node.vx;
+                    node.y += node.vy;
+                }
+            });
+        }
+        
+        // Draw function
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            
+            ctx.save();
+            ctx.translate(camera.x, camera.y);
+            ctx.scale(camera.zoom, camera.zoom);
+            ctx.translate(-camera.x, -camera.y);
+            
+            // Draw links
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+            ctx.lineWidth = 1;
+            
+            links.forEach(link => {
+                const source = nodes[link.source];
+                const target = nodes[link.target];
+                
+                ctx.beginPath();
+                ctx.moveTo(source.x, source.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const archetype = archetypes[node.archetype];
+                
+                // Node circle
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                
+                // Fill
+                if (node === hoveredNode || node === selectedNode) {
+                    ctx.fillStyle = archetype.color;
+                    ctx.globalAlpha = 0.8;
+                } else {
+                    ctx.fillStyle = archetype.color;
+                    ctx.globalAlpha = 0.6;
+                }
+                ctx.fill();
+                
+                // Border
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = archetype.color;
+                ctx.lineWidth = 2;
+                if (node === selectedNode) {
+                    ctx.lineWidth = 4;
+                }
+                ctx.stroke();
+                
+                // Equation text
+                ctx.fillStyle = '#e6f1ff';
+                ctx.font = '12px "Times New Roman", serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.equation, node.x, node.y);
+                
+                // Confidence indicator
+                const confidenceRadius = node.radius + 5;
+                const confidenceAngle = Math.PI * 2 * node.confidence;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, confidenceRadius, -Math.PI/2, -Math.PI/2 + confidenceAngle);
+                ctx.strokeStyle = '#64ffda';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            ctx.restore();
+        }
+        
+        // Animation loop
+        function animate() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        // Mouse events
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            
+            // Transform to world coordinates
+            const worldX = (mouse.x - camera.x) / camera.zoom + camera.x;
+            const worldY = (mouse.y - camera.y) / camera.zoom + camera.y;
+            
+            // Check hover
+            hoveredNode = null;
+            nodes.forEach(node => {
+                const dx = worldX - node.x;
+                const dy = worldY - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < node.radius) {
+                    hoveredNode = node;
+                    canvas.style.cursor = 'pointer';
+                }
+            });
+            
+            if (!hoveredNode) {
+                canvas.style.cursor = mouse.down ? 'grabbing' : 'grab';
+            }
+            
+            // Drag camera
+            if (mouse.down && mouse.dragStart && !selectedNode) {
+                camera.x += (e.clientX - mouse.dragStart.x) * 0.5;
+                camera.y += (e.clientY - mouse.dragStart.y) * 0.5;
+                mouse.dragStart = { x: e.clientX, y: e.clientY };
+            }
+            
+            // Drag node
+            if (selectedNode && mouse.down) {
+                selectedNode.x = worldX;
+                selectedNode.y = worldY;
+                selectedNode.fixed = true;
+            }
+        });
+        
+        canvas.addEventListener('mousedown', (e) => {
+            mouse.down = true;
+            mouse.dragStart = { x: e.clientX, y: e.clientY };
+            
+            if (hoveredNode) {
+                selectedNode = hoveredNode;
+                showInfoPanel(selectedNode);
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            mouse.down = false;
+            mouse.dragStart = null;
+            
+            if (selectedNode) {
+                selectedNode.fixed = false;
+            }
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            camera.zoom = Math.max(0.3, Math.min(3, camera.zoom * delta));
+        });
+        
+        // Show info panel
+        function showInfoPanel(node) {
+            const panel = document.getElementById('infoPanel');
+            const equation = document.getElementById('infoEquation');
+            const details = document.getElementById('infoDetails');
+            
+            equation.textContent = node.equation;
+            details.innerHTML = `
+                <div>Archetype: <span>${archetypes[node.archetype].name}</span></div>
+                <div>Description: <span>${node.description}</span></div>
+                <div>Confidence: <span>${(node.confidence * 100).toFixed(1)}%</span></div>
+                <div>Betti Numbers: <span>[${node.betti.join(', ')}]</span></div>
+                <div>Euler Characteristic: <span>${node.betti[0] - node.betti[1] + node.betti[2]}</span></div>
+            `;
+            
+            panel.classList.add('show');
+        }
+        
+        // Hide info panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.info-panel') && !e.target.closest('#mindMapCanvas')) {
+                document.getElementById('infoPanel').classList.remove('show');
+                selectedNode = null;
+            }
+        });
+        
+        // Search equations
+        function searchEquations(event) {
+            const query = event.target.value.toLowerCase();
+            
+            nodes.forEach(node => {
+                if (query === '') {
+                    node.highlighted = false;
+                } else {
+                    node.highlighted = node.equation.toLowerCase().includes(query) ||
+                                     node.description.toLowerCase().includes(query);
+                }
+            });
+        }
+        
+        // Reset view
+        function resetView() {
+            camera.x = width / 2;
+            camera.y = height / 2;
+            camera.zoom = 1;
+            
+            // Reset node positions
+            nodes.forEach((node, index) => {
+                const angle = (index / nodes.length) * Math.PI * 2;
+                const radius = 200 + Math.random() * 100;
+                node.x = camera.x + Math.cos(angle) * radius;
+                node.y = camera.y + Math.sin(angle) * radius;
+                node.vx = 0;
+                node.vy = 0;
+                node.fixed = false;
+            });
+        }
+        
+        // Toggle animation
+        function toggleAnimation() {
+            animationRunning = !animationRunning;
+        }
+        
+        // Update force strength
+        function updateForceStrength(value) {
+            forceStrength = value / 100;
+            document.getElementById('forceValue').textContent = value;
+        }
+        
+        // Update link distance
+        function updateLinkDistance(value) {
+            linkDistance = parseFloat(value);
+            document.getElementById('linkValue').textContent = value;
+        }
+        
+        // Validate equation
+        function validateEquation() {
+            if (!selectedNode) return;
+            
+            // Simulate validation
+            selectedNode.confidence = 0.9 + Math.random() * 0.1;
+            showInfoPanel(selectedNode);
+            
+            // Add validation effect
+            const originalRadius = selectedNode.radius;
+            selectedNode.radius = originalRadius * 1.5;
+            setTimeout(() => {
+                selectedNode.radius = originalRadius;
+            }, 300);
+        }
+        
+        // Update stats
+        function updateStats() {
+            document.getElementById('totalEquations').textContent = nodes.length;
+            document.getElementById('activeConnections').textContent = links.length;
+            
+            // Calculate average coherence
+            const avgCoherence = nodes.reduce((sum, node) => sum + node.confidence, 0) / nodes.length;
+            document.getElementById('phiCoherence').textContent = avgCoherence.toFixed(3);
+        }
+        
+        // Export map
+        function exportMap() {
+            const data = {
+                nodes: nodes.map(n => ({
+                    equation: n.equation,
+                    archetype: n.archetype,
+                    description: n.description,
+                    confidence: n.confidence,
+                    betti: n.betti
+                })),
+                links: links.map(l => ({
+                    source: nodes[l.source].equation,
+                    target: nodes[l.target].equation,
+                    strength: l.strength
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'equation-mindmap.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Add new equation dynamically
+        function addEquation(equation, archetype, description) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 200 + Math.random() * 100;
+            
+            const newNode = {
+                id: nodes.length,
+                equation: equation,
+                archetype: archetype,
+                description: description,
+                x: camera.x + Math.cos(angle) * radius,
+                y: camera.y + Math.sin(angle) * radius,
+                vx: 0,
+                vy: 0,
+                radius: 30,
+                confidence: 0.7 + Math.random() * 0.3,
+                betti: [
+                    Math.floor(Math.random() * 3) + 1,
+                    Math.floor(Math.random() * 3),
+                    Math.floor(Math.random() * 2)
+                ]
+            };
+            
+            nodes.push(newNode);
+            
+            // Connect to similar nodes
+            nodes.forEach((node, index) => {
+                if (node !== newNode && node.archetype === newNode.archetype) {
+                    links.push({
+                        source: index,
+                        target: nodes.length - 1,
+                        strength: 0.8
+                    });
+                }
+            });
+            
+            updateStats();
+        }
+        
+        // Simulate live updates
+        setInterval(() => {
+            // Update phi coherence
+            const coherence = 0.618 + Math.sin(Date.now() / 5000) * 0.1;
+            document.getElementById('phiCoherence').textContent = Math.max(0, Math.min(1, coherence)).toFixed(3);
+        }, 2000);
+    </script>
+</body>
+</html>

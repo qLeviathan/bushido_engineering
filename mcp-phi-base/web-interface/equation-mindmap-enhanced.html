@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>φ-Discovery | Enhanced Equation Mind Map</title>
+    <style>
+        :root {
+            --bg-primary: #0a192f;
+            --bg-secondary: #112240;
+            --bg-tertiary: #1a2744;
+            --accent-primary: #FFD700;
+            --accent-secondary: #4d96ff;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --text-dim: #495670;
+            --border-color: rgba(255, 215, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+            --success-color: #64ffda;
+            --error-color: #ff6b6b;
+            --phi: 1.618;
+            
+            /* Archetype colors */
+            --mechanics-color: #ff6b6b;
+            --quantum-color: #4ecdc4;
+            --relativity-color: #a8e6cf;
+            --thermodynamics-color: #ffd93d;
+            --electromagnetism-color: #95e1d3;
+            --topology-color: #c7ceea;
+            --golden-ratio-color: #FFD700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        .btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Canvas */
+        #mindMapCanvas {
+            background: var(--bg-primary);
+            cursor: grab;
+            flex: 1;
+        }
+        
+        #mindMapCanvas:active {
+            cursor: grabbing;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.hidden {
+            transform: translateX(100%);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+        
+        .sidebar-title {
+            font-size: 1rem;
+            color: var(--accent-primary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Equation Details */
+        .equation-display {
+            font-family: "Times New Roman", serif;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .equation-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .info-item {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        
+        .info-label {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+        
+        /* Visual Explanations */
+        .visual-explanation {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .betti-visual {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+        
+        .betti-number {
+            text-align: center;
+        }
+        
+        .betti-value {
+            font-size: 2rem;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+        
+        .betti-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        /* Toggle Groups */
+        .toggle-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .toggle-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+        
+        .toggle-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        /* Betti Logic Row */
+        .betti-logic-row {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 0 20px;
+        }
+        
+        .betti-logic-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .betti-logic-value {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+        
+        .betti-logic-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        /* Proof/Derivation Panel */
+        .proof-panel {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: "Times New Roman", serif;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .proof-step {
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 200px;
+        }
+        
+        .legend-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .legend-item:hover {
+            color: var(--text-primary);
+        }
+        
+        .legend-item.disabled {
+            opacity: 0.3;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* Search */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            width: 200px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .tooltip.visible {
+            opacity: 1;
+        }
+        
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: var(--accent-primary);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">
+            <span>φ-Discovery</span>
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">Enhanced Equation Mind Map</span>
+        </div>
+        
+        <div class="header-actions">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search equations..."
+                />
+            </div>
+            <button class="btn" onclick="resetView()">Reset View</button>
+            <button class="btn" onclick="toggleSidebar()">Toggle Details</button>
+            <button class="btn" onclick="window.location.href='index.html'">Back to Discovery</button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <canvas id="mindMapCanvas"></canvas>
+        
+        <!-- Legend with toggles -->
+        <div class="legend" id="legend">
+            <div class="legend-title">Equation Groups</div>
+            <div id="legendItems"></div>
+        </div>
+        
+        <!-- Sidebar for equation details -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Selected Equation</div>
+                <div class="equation-display" id="selectedEquation">
+                    Select an equation to view details
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Mathematical Properties</div>
+                <div class="equation-info" id="equationInfo"></div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Topological Analysis</div>
+                <div class="visual-explanation">
+                    <div class="betti-visual" id="bettiVisual"></div>
+                    <div id="eulerExplanation"></div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Proof / Derivation</div>
+                <div class="proof-panel" id="proofPanel"></div>
+            </div>
+        </div>
+        
+        <!-- Betti Logic Visualization Row -->
+        <div class="betti-logic-row">
+            <div class="betti-logic-item">
+                <div class="betti-logic-value" id="totalB0">0</div>
+                <div class="betti-logic-label">Total B₀ (Components)</div>
+            </div>
+            <div class="betti-logic-item">
+                <div class="betti-logic-value" id="totalB1">0</div>
+                <div class="betti-logic-label">Total B₁ (Cycles)</div>
+            </div>
+            <div class="betti-logic-item">
+                <div class="betti-logic-value" id="totalB2">0</div>
+                <div class="betti-logic-label">Total B₂ (Voids)</div>
+            </div>
+            <div class="betti-logic-item">
+                <div class="betti-logic-value" id="totalChi">0</div>
+                <div class="betti-logic-label">Total χ (Euler)</div>
+            </div>
+            <div class="betti-logic-item">
+                <div class="betti-logic-value" id="phiCoherence">1.618</div>
+                <div class="betti-logic-label">φ-Coherence</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+    
+    <script>
+        // Enhanced equation database with full information
+        const equationDatabase = {
+            // Mechanics
+            'F = ma': {
+                archetype: 'mechanics',
+                name: "Newton's Second Law",
+                discoverer: "Isaac Newton",
+                year: 1687,
+                tensor: "Vector equation: F^i = m·a^i",
+                units: "Force (N) = Mass (kg) × Acceleration (m/s²)",
+                example: "A 2kg object accelerating at 3m/s² experiences 6N of force",
+                proof: [
+                    "Starting from momentum: p = mv",
+                    "Force is rate of change of momentum: F = dp/dt",
+                    "F = d(mv)/dt = m(dv/dt) = ma",
+                    "Valid for constant mass systems"
+                ],
+                betti: [1, 0, 0],
+                symbols: ['Force', 'Mass', 'Acceleration'],
+                related: ['p = mv', 'E = ½mv²']
+            },
+            'E = ½mv²': {
+                archetype: 'mechanics',
+                name: "Kinetic Energy",
+                discoverer: "Gottfried Leibniz",
+                year: 1676,
+                tensor: "Scalar: E = ½m·v_i·v^i",
+                units: "Energy (J) = ½ × Mass (kg) × Velocity² (m²/s²)",
+                example: "A 1000kg car at 20m/s has 200,000J of kinetic energy",
+                proof: [
+                    "Work-energy theorem: W = ∫F·dx",
+                    "Using F = ma: W = ∫ma·dx = m∫a·dx",
+                    "Since a = dv/dt: W = m∫(dv/dt)dx",
+                    "Rearranging: W = m∫v·dv = ½mv²"
+                ],
+                betti: [1, 0, 0],
+                symbols: ['Energy', 'Motion', 'Velocity'],
+                related: ['F = ma', 'p = mv']
+            },
+            'p = mv': {
+                archetype: 'mechanics',
+                name: "Linear Momentum",
+                discoverer: "René Descartes",
+                year: 1644,
+                tensor: "Vector: p^i = m·v^i",
+                units: "Momentum (kg·m/s) = Mass (kg) × Velocity (m/s)",
+                example: "A 5kg ball moving at 10m/s has 50kg·m/s momentum",
+                proof: [
+                    "Definition of momentum as quantity of motion",
+                    "Conservation principle: Σp_initial = Σp_final",
+                    "Related to force: F = dp/dt",
+                    "In collisions, total momentum is conserved"
+                ],
+                betti: [1, 0, 0],
+                symbols: ['Momentum', 'Motion', 'Conservation'],
+                related: ['F = ma', 'E = ½mv²']
+            },
+            
+            // Quantum
+            'E = hf': {
+                archetype: 'quantum',
+                name: "Planck-Einstein Relation",
+                discoverer: "Max Planck & Albert Einstein",
+                year: 1905,
+                tensor: "Scalar: E = ℏω",
+                units: "Energy (J) = Planck constant (J·s) × Frequency (Hz)",
+                example: "Blue light (600THz) photon has E = 4×10⁻¹⁹J",
+                proof: [
+                    "Black body radiation requires quantized energy",
+                    "E = nhf where n is integer (Planck)",
+                    "Einstein: Light consists of photons with E = hf",
+                    "Confirmed by photoelectric effect"
+                ],
+                betti: [1, 1, 0],
+                symbols: ['Quantization', 'Photon', 'Frequency'],
+                related: ['ΔxΔp ≥ ℏ/2', 'E = mc²']
+            },
+            'ΔxΔp ≥ ℏ/2': {
+                archetype: 'quantum',
+                name: "Heisenberg Uncertainty Principle",
+                discoverer: "Werner Heisenberg",
+                year: 1927,
+                tensor: "Commutator: [x̂,p̂] = iℏ",
+                units: "Position uncertainty (m) × Momentum uncertainty (kg·m/s) ≥ ℏ/2",
+                example: "Electron in atom: Δx ~ 10⁻¹⁰m implies Δp ≥ 5×10⁻²⁵ kg·m/s",
+                proof: [
+                    "From wave function: ψ(x) and φ(p) are Fourier pairs",
+                    "Schwarz inequality: |⟨A⟩⟨B⟩| ≥ ½|⟨[A,B]⟩|",
+                    "For position/momentum: [x̂,p̂] = iℏ",
+                    "Therefore: ΔxΔp ≥ ℏ/2"
+                ],
+                betti: [1, 1, 0],
+                symbols: ['Uncertainty', 'Complementarity', 'Wave-Particle'],
+                related: ['Ĥ|ψ⟩ = E|ψ⟩', 'E = hf']
+            },
+            'Ĥ|ψ⟩ = E|ψ⟩': {
+                archetype: 'quantum',
+                name: "Time-Independent Schrödinger Equation",
+                discoverer: "Erwin Schrödinger",
+                year: 1926,
+                tensor: "Operator equation: (-ℏ²/2m)∇²ψ + Vψ = Eψ",
+                units: "Hamiltonian operator on wavefunction yields energy eigenvalue",
+                example: "Hydrogen atom: Solutions give electron orbitals",
+                proof: [
+                    "Start with time-dependent: iℏ∂ψ/∂t = Ĥψ",
+                    "Separate variables: ψ(x,t) = φ(x)e^(-iEt/ℏ)",
+                    "Substitute to get: Ĥφ(x) = Eφ(x)",
+                    "E are energy eigenvalues, φ are eigenstates"
+                ],
+                betti: [1, 2, 1],
+                symbols: ['Wavefunction', 'Eigenstate', 'Quantization'],
+                related: ['ΔxΔp ≥ ℏ/2', 'E = hf']
+            },
+            
+            // Relativity
+            'E = mc²': {
+                archetype: 'relativity',
+                name: "Mass-Energy Equivalence",
+                discoverer: "Albert Einstein",
+                year: 1905,
+                tensor: "E² = (pc)² + (mc²)² (full form)",
+                units: "Energy (J) = Mass (kg) × Speed of light² (m²/s²)",
+                example: "1kg of matter = 9×10¹⁶J (equivalent to 21.5 megatons TNT)",
+                proof: [
+                    "From relativistic momentum: p = γmv",
+                    "Total energy: E = γmc²",
+                    "At rest (v=0, γ=1): E₀ = mc²",
+                    "Mass is a form of concentrated energy"
+                ],
+                betti: [1, 0, 1],
+                symbols: ['Mass', 'Energy', 'Light Speed'],
+                related: ['γ = 1/√(1-v²/c²)', 'E = hf']
+            },
+            'γ = 1/√(1-v²/c²)': {
+                archetype: 'relativity',
+                name: "Lorentz Factor",
+                discoverer: "Hendrik Lorentz",
+                year: 1904,
+                tensor: "Scalar: Lorentz boost parameter",
+                units: "Dimensionless (γ ≥ 1)",
+                example: "At 0.9c, γ = 2.29 (time dilates by factor of 2.29)",
+                proof: [
+                    "From invariant interval: s² = (ct)² - x²",
+                    "Lorentz transformation preserves s²",
+                    "Time dilation: Δt' = γΔt",
+                    "Length contraction: L' = L/γ"
+                ],
+                betti: [1, 1, 0],
+                symbols: ['Time Dilation', 'Length Contraction', 'Relativity'],
+                related: ['E = mc²', 'ds² = -c²dt² + dx² + dy² + dz²']
+            },
+            
+            // Thermodynamics
+            'PV = nRT': {
+                archetype: 'thermodynamics',
+                name: "Ideal Gas Law",
+                discoverer: "Émile Clapeyron",
+                year: 1834,
+                tensor: "Scalar equation of state",
+                units: "Pressure (Pa) × Volume (m³) = moles × R × Temperature (K)",
+                example: "1 mole gas at STP: (101325 Pa)(0.0224 m³) = (1)(8.314)(273 K)",
+                proof: [
+                    "Combines empirical gas laws:",
+                    "Boyle: PV = constant (at constant T)",
+                    "Charles: V/T = constant (at constant P)",
+                    "Avogadro: V/n = constant (at constant P,T)",
+                    "Combined: PV = nRT"
+                ],
+                betti: [1, 0, 0],
+                symbols: ['Pressure', 'Volume', 'Temperature'],
+                related: ['dU = TdS - PdV', 'ΔS ≥ 0']
+            },
+            'ΔS ≥ 0': {
+                archetype: 'thermodynamics',
+                name: "Second Law of Thermodynamics",
+                discoverer: "Rudolf Clausius",
+                year: 1865,
+                tensor: "Scalar inequality",
+                units: "Entropy change (J/K) ≥ 0 for isolated systems",
+                example: "Ice melting: ΔS = 6.01 kJ/K per mole (positive)",
+                proof: [
+                    "Statistical: S = k·ln(Ω) where Ω is microstates",
+                    "Isolated system evolves to maximum Ω",
+                    "Therefore S increases: ΔS ≥ 0",
+                    "Equality only for reversible processes"
+                ],
+                betti: [1, 1, 0],
+                symbols: ['Entropy', 'Irreversibility', 'Arrow of Time'],
+                related: ['dU = TdS - PdV', 'PV = nRT']
+            },
+            
+            // Electromagnetism
+            '∇·E = ρ/ε₀': {
+                archetype: 'electromagnetism',
+                name: "Gauss's Law",
+                discoverer: "Carl Friedrich Gauss",
+                year: 1835,
+                tensor: "∂ᵢEⁱ = ρ/ε₀",
+                units: "Divergence of E-field (V/m²) = Charge density (C/m³) / ε₀",
+                example: "Point charge Q: E = Q/(4πε₀r²) radially outward",
+                proof: [
+                    "From Coulomb's law and superposition",
+                    "∮E·dA = Q_enclosed/ε₀ (integral form)",
+                    "By divergence theorem: ∫∇·E dV = ∫ρ/ε₀ dV",
+                    "Therefore locally: ∇·E = ρ/ε₀"
+                ],
+                betti: [1, 1, 0],
+                symbols: ['Electric Field', 'Charge', 'Flux'],
+                related: ['∇×B = μ₀J + μ₀ε₀∂E/∂t', 'F = q(E + v×B)']
+            },
+            
+            // Topology
+            'χ = V - E + F': {
+                archetype: 'topology',
+                name: "Euler Characteristic",
+                discoverer: "Leonhard Euler",
+                year: 1750,
+                tensor: "Topological invariant",
+                units: "χ = Vertices - Edges + Faces (dimensionless)",
+                example: "Sphere: χ = 2, Torus: χ = 0, Double torus: χ = -2",
+                proof: [
+                    "For polyhedra, χ is invariant under deformation",
+                    "Related to Betti numbers: χ = B₀ - B₁ + B₂",
+                    "For closed surfaces: χ = 2 - 2g (g = genus)",
+                    "Fundamental topological invariant"
+                ],
+                betti: [1, 0, 1],
+                symbols: ['Topology', 'Invariant', 'Connectivity'],
+                related: ['∮_C A·dr = ∬_S (∇×A)·dS']
+            },
+            
+            // Golden Ratio
+            'φ² = φ + 1': {
+                archetype: 'goldenRatio',
+                name: "Golden Ratio Definition",
+                discoverer: "Ancient Greeks",
+                year: -300,
+                tensor: "Algebraic relation",
+                units: "Dimensionless (φ ≈ 1.618...)",
+                example: "Rectangle with sides φ:1 - removing square leaves φ:1 rectangle",
+                proof: [
+                    "Definition: a/b = (a+b)/a ≡ φ",
+                    "Cross multiply: a² = b(a+b)",
+                    "Divide by b²: (a/b)² = (a/b) + 1",
+                    "Let φ = a/b: φ² = φ + 1"
+                ],
+                betti: [1, 1, 1],
+                symbols: ['φ', 'Recursion', 'Self-Similarity'],
+                related: ['φ = (1 + √5)/2', 'F_n = (φⁿ - ψⁿ)/√5']
+            },
+            'F_n = (φⁿ - ψⁿ)/√5': {
+                archetype: 'goldenRatio',
+                name: "Binet's Formula",
+                discoverer: "Jacques Philippe Marie Binet",
+                year: 1843,
+                tensor: "Closed form for Fibonacci",
+                units: "F_n = nth Fibonacci number",
+                example: "F₁₀ = (φ¹⁰ - ψ¹⁰)/√5 = 55",
+                proof: [
+                    "Fibonacci recurrence: F_n = F_{n-1} + F_{n-2}",
+                    "Characteristic equation: x² = x + 1",
+                    "Roots: φ = (1+√5)/2, ψ = (1-√5)/2", 
+                    "General solution: F_n = Aφⁿ + Bψⁿ",
+                    "Initial conditions give: F_n = (φⁿ - ψⁿ)/√5"
+                ],
+                betti: [1, 2, 0],
+                symbols: ['Fibonacci', 'φ', 'Exponential Growth'],
+                related: ['φ² = φ + 1', 'φ = (1 + √5)/2']
+            }
+        };
+
+        // Canvas and context
+        const canvas = document.getElementById('mindMapCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        
+        // Mind map state
+        let nodes = [];
+        let links = [];
+        let selectedNode = null;
+        let hoveredNode = null;
+        let camera = { x: 0, y: 0, zoom: 1 };
+        let mouse = { x: 0, y: 0, down: false, dragStart: null };
+        
+        // Archetype configurations
+        const archetypes = {
+            mechanics: { 
+                color: '#ff6b6b', 
+                name: 'Mechanics',
+                description: 'Classical motion and forces',
+                visible: true
+            },
+            quantum: { 
+                color: '#4ecdc4', 
+                name: 'Quantum',
+                description: 'Quantum mechanics and uncertainty',
+                visible: true
+            },
+            relativity: { 
+                color: '#a8e6cf', 
+                name: 'Relativity',
+                description: 'Space, time, and mass-energy',
+                visible: true
+            },
+            thermodynamics: { 
+                color: '#ffd93d', 
+                name: 'Thermodynamics',
+                description: 'Heat, entropy, and statistical mechanics',
+                visible: true
+            },
+            electromagnetism: { 
+                color: '#95e1d3', 
+                name: 'Electromagnetism',
+                description: 'Electric and magnetic fields',
+                visible: true
+            },
+            topology: { 
+                color: '#c7ceea', 
+                name: 'Topology',
+                description: 'Geometric invariants and continuity',
+                visible: true
+            },
+            goldenRatio: { 
+                color: '#FFD700', 
+                name: 'Golden Ratio',
+                description: 'φ and Fibonacci relationships',
+                visible: true
+            }
+        };
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initializeNodes();
+            initializeLinks();
+            createLegend();
+            updateBettiTotals();
+            animate();
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        function resizeCanvas() {
+            const mainContent = document.querySelector('.main-content');
+            const bettiRow = document.querySelector('.betti-logic-row');
+            width = mainContent.clientWidth;
+            height = mainContent.clientHeight - bettiRow.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+            camera.x = width / 2;
+            camera.y = height / 2;
+        }
+        
+        // Initialize nodes with hierarchical positioning
+        function initializeNodes() {
+            const equations = Object.keys(equationDatabase);
+            const archetypeGroups = {};
+            
+            // Group equations by archetype
+            equations.forEach(eq => {
+                const data = equationDatabase[eq];
+                if (!archetypeGroups[data.archetype]) {
+                    archetypeGroups[data.archetype] = [];
+                }
+                archetypeGroups[data.archetype].push(eq);
+            });
+            
+            // Create hierarchical layout with golden ratio spacing
+            let nodeId = 0;
+            const centerX = camera.x;
+            const centerY = camera.y;
+            const baseRadius = 200;
+            const PHI = 1.618;
+            
+            Object.keys(archetypeGroups).forEach((archetype, archetypeIndex) => {
+                const equations = archetypeGroups[archetype];
+                const archetypeAngle = (archetypeIndex / Object.keys(archetypeGroups).length) * Math.PI * 2;
+                
+                // Parent node for archetype
+                const parentX = centerX + Math.cos(archetypeAngle) * baseRadius;
+                const parentY = centerY + Math.sin(archetypeAngle) * baseRadius;
+                
+                equations.forEach((eq, eqIndex) => {
+                    const data = equationDatabase[eq];
+                    const childRadius = baseRadius / PHI;
+                    const childAngle = archetypeAngle + (eqIndex - equations.length/2) * 0.3;
+                    
+                    nodes.push({
+                        id: nodeId++,
+                        equation: eq,
+                        archetype: archetype,
+                        data: data,
+                        x: parentX + Math.cos(childAngle) * childRadius,
+                        y: parentY + Math.sin(childAngle) * childRadius,
+                        vx: 0,
+                        vy: 0,
+                        radius: 35,
+                        level: eqIndex === 0 ? 1 : 2, // First equation in group is primary
+                        visible: true
+                    });
+                });
+            });
+        }
+        
+        // Initialize links with relationship strengths
+        function initializeLinks() {
+            nodes.forEach((node, i) => {
+                const data = node.data;
+                
+                // Connect to related equations
+                if (data.related) {
+                    data.related.forEach(relatedEq => {
+                        const targetIndex = nodes.findIndex(n => n.equation === relatedEq);
+                        if (targetIndex !== -1 && targetIndex > i) {
+                            links.push({
+                                source: i,
+                                target: targetIndex,
+                                strength: 0.8,
+                                type: 'related'
+                            });
+                        }
+                    });
+                }
+                
+                // Connect within same archetype
+                nodes.forEach((other, j) => {
+                    if (i < j && node.archetype === other.archetype) {
+                        links.push({
+                            source: i,
+                            target: j,
+                            strength: 0.5,
+                            type: 'archetype'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Create interactive legend
+        function createLegend() {
+            const legendItems = document.getElementById('legendItems');
+            legendItems.innerHTML = '';
+            
+            Object.keys(archetypes).forEach(key => {
+                const archetype = archetypes[key];
+                const item = document.createElement('div');
+                item.className = `legend-item ${archetype.visible ? '' : 'disabled'}`;
+                item.innerHTML = `
+                    <div class="legend-color" style="background: ${archetype.color}"></div>
+                    <span>${archetype.name}</span>
+                `;
+                item.onclick = () => toggleArchetype(key);
+                item.title = archetype.description;
+                legendItems.appendChild(item);
+            });
+        }
+        
+        // Toggle archetype visibility
+        function toggleArchetype(archetypeKey) {
+            archetypes[archetypeKey].visible = !archetypes[archetypeKey].visible;
+            
+            // Update node visibility
+            nodes.forEach(node => {
+                if (node.archetype === archetypeKey) {
+                    node.visible = archetypes[archetypeKey].visible;
+                }
+            });
+            
+            createLegend();
+            updateBettiTotals();
+        }
+        
+        // Update physics with golden ratio-based spacing
+        function updatePhysics() {
+            const PHI = 1.618;
+            const centerForce = 0.005;
+            const repelForce = 2000;
+            const attractForce = 0.02;
+            
+            nodes.forEach((node, i) => {
+                if (!node.visible) return;
+                
+                // Reset forces
+                node.fx = 0;
+                node.fy = 0;
+                
+                // Gentle center attraction
+                const dx = camera.x - node.x;
+                const dy = camera.y - node.y;
+                node.fx += dx * centerForce;
+                node.fy += dy * centerForce;
+                
+                // Repulsion between all visible nodes
+                nodes.forEach((other, j) => {
+                    if (i !== j && other.visible) {
+                        const dx = node.x - other.x;
+                        const dy = node.y - other.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist > 0 && dist < 300) {
+                            const force = repelForce / (dist * dist);
+                            node.fx += (dx / dist) * force;
+                            node.fy += (dy / dist) * force;
+                        }
+                    }
+                });
+            });
+            
+            // Apply link forces with φ-based distances
+            links.forEach(link => {
+                const source = nodes[link.source];
+                const target = nodes[link.target];
+                
+                if (!source.visible || !target.visible) return;
+                
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 0) {
+                    // φ-based ideal distance
+                    const idealDist = link.type === 'archetype' ? 150 : 150 * PHI;
+                    const force = (dist - idealDist) * link.strength * attractForce;
+                    const fx = (dx / dist) * force;
+                    const fy = (dy / dist) * force;
+                    
+                    source.fx += fx;
+                    source.fy += fy;
+                    target.fx -= fx;
+                    target.fy -= fy;
+                }
+            });
+            
+            // Update positions
+            nodes.forEach(node => {
+                if (!node.visible) return;
+                
+                // Apply forces with damping
+                node.vx = (node.vx + node.fx) * 0.85;
+                node.vy = (node.vy + node.fy) * 0.85;
+                
+                // Update position
+                node.x += node.vx;
+                node.y += node.vy;
+            });
+        }
+        
+        // Enhanced drawing function
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            
+            ctx.save();
+            ctx.translate(camera.x, camera.y);
+            ctx.scale(camera.zoom, camera.zoom);
+            ctx.translate(-camera.x, -camera.y);
+            
+            // Draw links
+            links.forEach(link => {
+                const source = nodes[link.source];
+                const target = nodes[link.target];
+                
+                if (!source.visible || !target.visible) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(source.x, source.y);
+                ctx.lineTo(target.x, target.y);
+                
+                if (link.type === 'related') {
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
+                    ctx.lineWidth = 2;
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.1)';
+                    ctx.lineWidth = 1;
+                }
+                
+                ctx.stroke();
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                if (!node.visible) return;
+                
+                const archetype = archetypes[node.archetype];
+                const isHovered = node === hoveredNode;
+                const isSelected = node === selectedNode;
+                
+                // Node glow effect
+                if (isHovered || isSelected) {
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius + 10, 0, Math.PI * 2);
+                    const gradient = ctx.createRadialGradient(
+                        node.x, node.y, node.radius,
+                        node.x, node.y, node.radius + 10
+                    );
+                    gradient.addColorStop(0, archetype.color + '40');
+                    gradient.addColorStop(1, archetype.color + '00');
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+                
+                // Main node circle
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                
+                // Fill with gradient
+                const gradient = ctx.createRadialGradient(
+                    node.x - node.radius/3, node.y - node.radius/3, 0,
+                    node.x, node.y, node.radius
+                );
+                gradient.addColorStop(0, archetype.color + 'FF');
+                gradient.addColorStop(1, archetype.color + 'AA');
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // Border
+                ctx.strokeStyle = isSelected ? '#FFFFFF' : archetype.color;
+                ctx.lineWidth = isSelected ? 3 : 2;
+                ctx.stroke();
+                
+                // Equation text
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = `${14 * (node.level === 1 ? 1.2 : 1)}px "Times New Roman", serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.equation, node.x, node.y - 5);
+                
+                // Name text
+                ctx.font = '10px "SF Mono", monospace';
+                ctx.fillStyle = '#e6f1ff';
+                ctx.fillText(node.data.name, node.x, node.y + 15);
+                
+                // Betti indicator dots
+                const bettiY = node.y + node.radius - 5;
+                const bettiSpacing = 8;
+                const bettiStartX = node.x - (node.data.betti.length - 1) * bettiSpacing / 2;
+                
+                node.data.betti.forEach((b, i) => {
+                    ctx.beginPath();
+                    ctx.arc(bettiStartX + i * bettiSpacing, bettiY, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = b > 0 ? '#64ffda' : '#495670';
+                    ctx.fill();
+                });
+            });
+            
+            ctx.restore();
+        }
+        
+        // Animation loop
+        function animate() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        // Mouse event handlers
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            
+            // Transform to world coordinates
+            const worldX = (mouse.x - camera.x) / camera.zoom + camera.x;
+            const worldY = (mouse.y - camera.y) / camera.zoom + camera.y;
+            
+            // Check hover
+            hoveredNode = null;
+            nodes.forEach(node => {
+                if (!node.visible) return;
+                
+                const dx = worldX - node.x;
+                const dy = worldY - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < node.radius) {
+                    hoveredNode = node;
+                    canvas.style.cursor = 'pointer';
+                    showTooltip(node, e.clientX, e.clientY);
+                }
+            });
+            
+            if (!hoveredNode) {
+                canvas.style.cursor = mouse.down ? 'grabbing' : 'grab';
+                hideTooltip();
+            }
+            
+            // Camera drag
+            if (mouse.down && mouse.dragStart && !selectedNode) {
+                camera.x += (mouse.x - mouse.dragStart.x);
+                camera.y += (mouse.y - mouse.dragStart.y);
+                mouse.dragStart = { x: mouse.x, y: mouse.y };
+            }
+        });
+        
+        canvas.addEventListener('mousedown', (e) => {
+            mouse.down = true;
+            mouse.dragStart = { x: mouse.x, y: mouse.y };
+            
+            if (hoveredNode) {
+                selectNode(hoveredNode);
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            mouse.down = false;
+            mouse.dragStart = null;
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const newZoom = Math.max(0.3, Math.min(3, camera.zoom * delta));
+            
+            // Zoom towards mouse position
+            const zoomRatio = newZoom / camera.zoom;
+            camera.x = mouse.x - (mouse.x - camera.x) * zoomRatio;
+            camera.y = mouse.y - (mouse.y - camera.y) * zoomRatio;
+            camera.zoom = newZoom;
+        });
+        
+        // Node selection
+        function selectNode(node) {
+            selectedNode = node;
+            updateSidebar(node);
+        }
+        
+        // Update sidebar with equation details
+        function updateSidebar(node) {
+            const data = node.data;
+            
+            // Update equation display
+            document.getElementById('selectedEquation').textContent = node.equation;
+            
+            // Update equation info
+            const infoHtml = `
+                <div class="info-item">
+                    <span class="info-label">Name:</span> ${data.name}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Discoverer:</span> ${data.discoverer} (${data.year})
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tensor Form:</span><br>${data.tensor}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Units:</span><br>${data.units}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Example:</span><br>${data.example}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Key Symbols:</span> ${data.symbols.join(', ')}
+                </div>
+            `;
+            document.getElementById('equationInfo').innerHTML = infoHtml;
+            
+            // Update Betti visualization
+            const bettiHtml = `
+                <div class="betti-number">
+                    <div class="betti-value">${data.betti[0]}</div>
+                    <div class="betti-label">B₀<br>Components</div>
+                </div>
+                <div class="betti-number">
+                    <div class="betti-value">${data.betti[1]}</div>
+                    <div class="betti-label">B₁<br>Cycles</div>
+                </div>
+                <div class="betti-number">
+                    <div class="betti-value">${data.betti[2]}</div>
+                    <div class="betti-label">B₂<br>Voids</div>
+                </div>
+            `;
+            document.getElementById('bettiVisual').innerHTML = bettiHtml;
+            
+            // Calculate and explain Euler characteristic
+            const chi = data.betti[0] - data.betti[1] + data.betti[2];
+            const eulerHtml = `
+                <div style="margin-top: 15px;">
+                    <div style="font-size: 1.2rem; color: var(--accent-primary);">
+                        χ = ${data.betti[0]} - ${data.betti[1]} + ${data.betti[2]} = ${chi}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-secondary);">
+                        ${getEulerExplanation(chi)}
+                    </div>
+                </div>
+            `;
+            document.getElementById('eulerExplanation').innerHTML = eulerHtml;
+            
+            // Update proof panel
+            const proofHtml = data.proof.map((step, i) => 
+                `<div class="proof-step">${i + 1}. ${step}</div>`
+            ).join('');
+            document.getElementById('proofPanel').innerHTML = proofHtml;
+        }
+        
+        // Get Euler characteristic explanation
+        function getEulerExplanation(chi) {
+            if (chi === 2) return "χ = 2: Sphere-like topology (simply connected)";
+            if (chi === 1) return "χ = 1: Projective plane topology";
+            if (chi === 0) return "χ = 0: Torus-like topology (one hole)";
+            if (chi < 0) return `χ = ${chi}: Higher genus surface (${Math.abs(chi/2 + 1)} holes)`;
+            return `χ = ${chi}: Complex topological structure`;
+        }
+        
+        // Update Betti totals
+        function updateBettiTotals() {
+            let totalB0 = 0, totalB1 = 0, totalB2 = 0;
+            
+            nodes.forEach(node => {
+                if (node.visible) {
+                    totalB0 += node.data.betti[0];
+                    totalB1 += node.data.betti[1];
+                    totalB2 += node.data.betti[2];
+                }
+            });
+            
+            const totalChi = totalB0 - totalB1 + totalB2;
+            const phiCoherence = (totalB1 / totalB0).toFixed(3);
+            
+            document.getElementById('totalB0').textContent = totalB0;
+            document.getElementById('totalB1').textContent = totalB1;
+            document.getElementById('totalB2').textContent = totalB2;
+            document.getElementById('totalChi').textContent = totalChi;
+            document.getElementById('phiCoherence').textContent = phiCoherence;
+        }
+        
+        // Tooltip functionality
+        function showTooltip(node, x, y) {
+            const tooltip = document.getElementById('tooltip');
+            const data = node.data;
+            tooltip.innerHTML = `
+                <strong>${node.equation}</strong><br>
+                ${data.name}<br>
+                <span style="color: var(--accent-primary);">Click for details</span>
+            `;
+            tooltip.style.left = x + 10 + 'px';
+            tooltip.style.top = y - 40 + 'px';
+            tooltip.classList.add('visible');
+        }
+        
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('visible');
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            nodes.forEach(node => {
+                const data = node.data;
+                const matches = query === '' || 
+                    node.equation.toLowerCase().includes(query) ||
+                    data.name.toLowerCase().includes(query) ||
+                    data.discoverer.toLowerCase().includes(query) ||
+                    data.symbols.some(s => s.toLowerCase().includes(query));
+                
+                node.highlighted = matches;
+                
+                // Zoom to first match
+                if (matches && query !== '') {
+                    camera.x = width/2 - node.x * camera.zoom;
+                    camera.y = height/2 - node.y * camera.zoom;
+                }
+            });
+        });
+        
+        // UI functions
+        function resetView() {
+            camera.x = width / 2;
+            camera.y = height / 2;
+            camera.zoom = 1;
+            
+            // Show all archetypes
+            Object.keys(archetypes).forEach(key => {
+                archetypes[key].visible = true;
+                nodes.forEach(node => {
+                    if (node.archetype === key) {
+                        node.visible = true;
+                    }
+                });
+            });
+            
+            createLegend();
+            updateBettiTotals();
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('hidden');
+        }
+        
+        // Auto-update φ-coherence with golden ratio oscillation
+        setInterval(() => {
+            const baseCoherence = 1.618;
+            const oscillation = Math.sin(Date.now() / 3000) * 0.1;
+            const coherence = (baseCoherence + oscillation).toFixed(3);
+            document.getElementById('phiCoherence').textContent = coherence;
+        }, 100);
+    </script>
+</body>
+</html>

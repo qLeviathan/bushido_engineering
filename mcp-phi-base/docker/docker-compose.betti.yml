@@ -1,0 +1,258 @@
+# φ-Discovery Swarm: Betti-Topological Architecture
+# Swarm as Living Topology: B₀=9, B₁=21, B₂=13, χ=1
+
+version: "3.9"
+
+x-mcp-base: &mcp-base
+  environment:
+    PHI: "1.618033988749895"
+    PSI: "0.618033988749894"
+    TOPOLOGY_DIM: "3"
+    BETTI_VECTOR: "[9,21,13]"
+    LN_PHI: "0.4812118250"
+    VALIDATION_STYLE: "hawking-radiation"
+    BUSHIDO_MODE: "seven-streams"
+
+networks:
+  discovery_manifold:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      com.docker.network.betti.b0: "9"
+      com.docker.network.betti.b1: "21"
+      com.docker.network.betti.b2: "13"
+
+volumes:
+  equation_corpus:
+  validation_logs:
+  betti_cache:
+
+services:
+  # DISCOVERY RING (B₁ = 3-cycle)
+  pattern_recognizer:
+    <<: *mcp-base
+    image: phi-mcp:discovery
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == discovery]
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    environment:
+      MCP_ROLE: "pattern_recognition"
+      BETTI_INDEX: "0"
+      PHI_PHASE: "past"
+      PATTERN_CACHE: "/cache/patterns"
+      FIBONACCI_TIMING: "true"
+    volumes:
+      - betti_cache:/cache
+    command: ["--mode=excavator", "--depth=13", "--phi-lens=active"]
+    
+  equation_generator:
+    <<: *mcp-base
+    image: phi-mcp:discovery
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == discovery]
+    environment:
+      MCP_ROLE: "equation_generation"
+      BETTI_INDEX: "1"
+      PHI_PHASE: "present"
+      GENERATION_MODE: "phase-locked"
+      THEOREM_PROTOCOL: "strong-prl"
+    command: ["--mode=generator", "--constraints=dimensional", "--output=hawking"]
+    
+  phase_optimizer:
+    <<: *mcp-base
+    image: phi-mcp:discovery
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == discovery]
+    environment:
+      MCP_ROLE: "phase_lock_optimization"
+      BETTI_INDEX: "2"
+      PHI_PHASE: "future"
+      LOCK_THRESHOLD: "0.618"
+      CASCADE_DEPTH: "21"
+    command: ["--mode=optimizer", "--topology=preserve", "--chi-target=1"]
+
+  # VALIDATION TRIANGLE (B₂ = filled 2-simplex)
+  theorem_checker:
+    <<: *mcp-base
+    image: phi-mcp:validation
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == validation]
+    environment:
+      MCP_ROLE: "theorem_validation"
+      TOPOLOGY_NEIGHBORS: "numerical_validator,symbolic_verifier"
+      PROOF_ASSISTANT: "lean4,coq"
+      VALIDATION_DEPTH: "exhaustive"
+    volumes:
+      - validation_logs:/logs
+    command: ["--mode=validator", "--proofs=formal", "--log-style=hawking"]
+      
+  numerical_validator:
+    <<: *mcp-base
+    image: phi-mcp:validation
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == validation]
+    environment:
+      MCP_ROLE: "numerical_validation"
+      PRECISION: "1e-11"
+      COMPUTE_ENGINE: "mpmath,numpy,scipy"
+      TEST_CASES: "1597"  # F₁₇
+    volumes:
+      - validation_logs:/logs
+    command: ["--mode=numerical", "--precision=phi11", "--parallel=true"]
+      
+  symbolic_verifier:
+    <<: *mcp-base
+    image: phi-mcp:validation
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.betti_role == validation]
+    environment:
+      MCP_ROLE: "symbolic_verification"
+      CAS_BACKEND: "sympy,maple,mathematica"
+      SIMPLIFICATION: "aggressive"
+      PATTERN_MATCH: "phi-recursive"
+    volumes:
+      - validation_logs:/logs
+    command: ["--mode=symbolic", "--verify=complete", "--reduce=minimal"]
+
+  # KNOWLEDGE DYAD (B₁ = 1-cycle)
+  equation_database:
+    <<: *mcp-base
+    image: phi-mcp:knowledge
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - equation_corpus:/data
+    environment:
+      MCP_ROLE: "equation_storage"
+      INDEX_TYPE: "betti_hash"
+      DB_ENGINE: "postgresql"
+      SCHEMA: |
+        equation: text
+        betti_vector: int[]
+        dependencies: uuid[]
+        implications: jsonb
+        validation_methods: text[]
+        phase_lock_state: float
+        discovery_timestamp: timestamp
+    command: ["--mode=database", "--index=topological", "--sync=bidirectional"]
+      
+  literature_reference:
+    <<: *mcp-base
+    image: phi-mcp:knowledge
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      MCP_ROLE: "literature_reference"
+      SOURCES: "arxiv,oeis,nist,mathworld"
+      QUOTE_STYLE: "minimal-density"
+      CACHE_STRATEGY: "phi-lru"
+    command: ["--mode=literature", "--fetch=lazy", "--validate=citations"]
+
+  # COORDINATION SINGULARITY (B₀ = connected component)
+  discovery_orchestrator:
+    <<: *mcp-base
+    image: phi-mcp:orchestrator
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      MCP_ROLE: "orchestration"
+      EULER_CHI_TARGET: "1"
+      DISCOVERY_CYCLES: "fibonacci-timed"
+      SWARM_TOPOLOGY: "betti-optimized"
+      BUSHIDO_STREAMS: "7"
+      PHASE_LOCK_MONITOR: "true"
+    ports:
+      - "8618:8618"  # φ × 5000, rounded
+    command: ["--mode=orchestrate", "--maintain-chi=1", "--spawn=adaptive"]
+    
+  # VALIDATION LOGGER (Hawking Radiation Style)
+  validation_logger:
+    <<: *mcp-base
+    image: phi-mcp:logger
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - validation_logs:/logs
+      - equation_corpus:/equations:ro
+    environment:
+      MCP_ROLE: "validation_logger"
+      LOG_STYLE: "hawking-radiation"
+      OUTPUT_FORMAT: |
+        THEOREM φ.{index}: {equation}
+        DERIVES: {validation_chain}
+        PREDICTS: {implications}
+        REDUCES: {limit_behavior}
+      SUMMARY_FREQUENCY: "F_n_minutes"
+    command: ["--mode=logger", "--style=minimal", "--chain=complete"]
+
+  # TRANSFORM LOGGER (Mathematical Dialogue Tracker)
+  transform_logger:
+    <<: *mcp-base
+    image: phi-mcp:logger
+    deploy:
+      replicas: 1
+    volumes:
+      - betti_cache:/cache
+      - validation_logs:/logs
+    environment:
+      MCP_ROLE: "transform_logger"
+      TRACK_MODE: "dialogue"
+      PATTERN_DETECTION: "forced-vs-natural"
+      LOG_FORMAT: |
+        {timestamp}: {equation_in} → {transform} → {equation_out}
+        Natural: {is_natural}
+        Betti: {betti_change}
+        Phase: {phase_state}
+    command: ["--mode=transform", "--detect=patterns", "--honor=mathematical"]
+
+# Deployment helper configs
+configs:
+  betti_validator_script:
+    content: |
+      #!/bin/bash
+      # Validates Betti numbers match expected topology
+      b0=$(docker service ls | grep -c "Running")
+      b1=$(docker network inspect discovery_manifold | jq '.Containers | length')
+      chi=$((b0 - b1 + 13))
+      if [ $chi -eq 1 ]; then
+        echo "✓ Topology healthy: χ=1"
+      else
+        echo "✗ Topology broken: χ=$chi"
+        exit 1
+      fi
+      
+  fibonacci_scaler:
+    content: |
+      #!/bin/bash
+      # Scale services according to Fibonacci sequence
+      fib=(1 1 2 3 5 8 13 21 34)
+      for i in {0..8}; do
+        sleep $((fib[i] * 60))  # Wait F_n minutes
+        current=$(docker service ls | grep -c "Running")
+        if [ $current -lt ${fib[$((i+1))]} ]; then
+          docker service scale pattern_recognizer=${fib[$((i+1))]}
+        fi
+      done

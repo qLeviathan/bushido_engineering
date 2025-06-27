@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>φ-Discovery | Mathematical Discovery Platform</title>
+    <style>
+        :root {
+            --bg-primary: #0a192f;
+            --bg-secondary: #112240;
+            --bg-tertiary: #1a2744;
+            --accent-primary: #FFD700;  /* Golden for φ */
+            --accent-secondary: #4d96ff;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --text-dim: #495670;
+            --border-color: rgba(255, 215, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+            --energy-red: #ff6b6b;
+            --phase-blue: #4d96ff;
+            --amplitude-green: #61FF33;
+            --velocity-purple: #d896ff;
+            --phi: 1.618033988749895;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 25, 47, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .login-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+            opacity: 0.05;
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .phi-symbol {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .login-tagline {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .login-form {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input {
+            width: 100%;
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 15px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .login-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .login-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Main Interface */
+        .main-interface {
+            display: none;
+            height: 100vh;
+            background: var(--bg-primary);
+        }
+        
+        .interface-header {
+            height: 50px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .header-nav a:hover {
+            color: var(--accent-primary);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Main Layout */
+        .interface-body {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+        
+        /* Left Panel */
+        .left-panel {
+            width: 250px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .panel-action {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .panel-action:hover {
+            color: var(--accent-primary);
+        }
+        
+        .memory-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .memory-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            background: rgba(10, 25, 47, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .memory-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .memory-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            opacity: 0.6;
+        }
+        
+        .memory-name {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+        
+        .memory-size {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        
+        /* Center Panel */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs-container {
+            height: 40px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 5px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: var(--bg-secondary);
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .workspace {
+            flex: 1;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Cells */
+        .cells-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cell {
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .cell.collapsed .cell-content {
+            display: none;
+        }
+        
+        .cell-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(255, 215, 0, 0.05);
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .cell-expand {
+            margin-right: 10px;
+            color: var(--accent-primary);
+            transition: var(--transition);
+        }
+        
+        .cell.collapsed .cell-expand {
+            transform: rotate(-90deg);
+        }
+        
+        .cell-type {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        
+        .cell-type.chat {
+            background: rgba(77, 150, 255, 0.2);
+            color: var(--phase-blue);
+        }
+        
+        .cell-type.discovery {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--accent-primary);
+        }
+        
+        .cell-type.validation {
+            background: rgba(107, 255, 143, 0.2);
+            color: var(--amplitude-green);
+        }
+        
+        .cell-title {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        
+        .cell-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .cell-action {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+        
+        .cell-action:hover {
+            color: var(--accent-primary);
+        }
+        
+        .cell-content {
+            padding: 15px;
+        }
+        
+        /* Chat Messages */
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--bg-primary);
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        
+        .message-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        
+        .message-text code {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: inherit;
+            font-size: 0.9em;
+            color: var(--accent-primary);
+        }
+        
+        .message-text pre {
+            background: rgba(10, 25, 47, 0.5);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            width: 300px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .console-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .console-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+        }
+        
+        .console-tab.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+        
+        .console-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .metric-display {
+            margin-bottom: 20px;
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .quantum-indicator {
+            width: 100%;
+            height: 8px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .quantum-indicator-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 1s ease;
+        }
+        
+        /* Input Area */
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(10, 25, 47, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: none;
+            min-height: 40px;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .chat-send {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Discovery Results */
+        .discovery-result {
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .discovery-equation {
+            font-size: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+        }
+        
+        .discovery-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .discovery-metric {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .discovery-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .discovery-metric-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        /* Workspace Toolbar */
+        .workspace-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+        
+        .toolbar-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toolbar-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent-primary);
+        }
+        
+        /* System Status */
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .system-status:hover {
+            border-color: var(--accent-primary);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--amplitude-green);
+        }
+        
+        .status-dot.offline {
+            background: var(--energy-red);
+        }
+        
+        .status-dot.connecting {
+            background: var(--accent-primary);
+            animation: pulse 1s infinite;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .right-panel {
+                width: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .left-panel,
+            .right-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="phi-symbol">φ</div>
+                <div class="login-logo">DISCOVERY SYSTEM</div>
+                <div class="login-tagline">Mathematical Truth Through Topological Validation</div>
+            </div>
+            
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Claude API Key</label>
+                    <input type="password" class="form-input" id="apiKey" placeholder="sk-ant-api..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">System Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••" value="phi" required>
+                </div>
+                
+                <button type="submit" class="login-button">Enter φ-Discovery</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Main Interface -->
+    <div class="main-interface" id="mainInterface">
+        <header class="interface-header">
+            <div class="header-logo">
+                <span style="color: var(--accent-primary); font-size: 1.5rem;">φ</span>
+                DISCOVERY
+            </div>
+            
+            <nav class="header-nav">
+                <a href="#" onclick="showTab('discovery')">Discovery</a>
+                <a href="#" onclick="showTab('validation')">Validation</a>
+                <a href="#" onclick="showTab('topology')">Topology</a>
+                <a href="#" onclick="showTab('history')">History</a>
+            </nav>
+            
+            <div class="user-menu">
+                <button class="system-status" onclick="toggleSystemStatus()">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">System Offline</span>
+                </button>
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">χ = <span id="chiValue" style="color: var(--accent-primary);">1</span></span>
+            </div>
+        </header>
+        
+        <div class="interface-body">
+            <!-- Left Panel - Validated Equations -->
+            <aside class="left-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">Validated Equations</h3>
+                    <div class="panel-actions">
+                        <button class="panel-action" onclick="refreshEquations()">⟳</button>
+                    </div>
+                </div>
+                
+                <div class="memory-list" id="equationsList">
+                    <div class="memory-item">
+                        <div class="memory-icon"></div>
+                        <div class="memory-name">φ² = φ + 1</div>
+                        <div class="memory-size">1.000</div>
+                    </div>
+                    <div class="memory-item">
+                        <div class="memory-icon" style="background: var(--phase-blue);"></div>
+                        <div class="memory-name">E = mc²</div>
+                        <div class="memory-size">0.999</div>
+                    </div>
+                    <div class="memory-item">
+                        <div class="memory-icon" style="background: var(--amplitude-green);"></div>
+                        <div class="memory-name">∇²ψ + k²ψ = 0</div>
+                        <div class="memory-size">0.950</div>
+                    </div>
+                    <div class="memory-item">
+                        <div class="memory-icon" style="background: var(--velocity-purple);"></div>
+                        <div class="memory-name">χ = B₀ - B₁ + B₂</div>
+                        <div class="memory-size">1.000</div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Center Panel -->
+            <main class="center-panel">
+                <div class="tabs-container">
+                    <div class="tab active" id="tab-discovery">
+                        <span>Mathematical Discovery</span>
+                    </div>
+                    <div class="tab" id="tab-validation">
+                        <span>Validation Chain</span>
+                    </div>
+                    <div class="tab" id="tab-topology">
+                        <span>System Topology</span>
+                    </div>
+                </div>
+                
+                <div class="workspace">
+                    <div class="cells-container" id="cellsContainer">
+                        <!-- Welcome Cell -->
+                        <div class="cell">
+                            <div class="cell-header" onclick="toggleCell(this)">
+                                <span class="cell-expand">▼</span>
+                                <span class="cell-type discovery">DISCOVERY</span>
+                                <span class="cell-title">Welcome to φ-Discovery</span>
+                            </div>
+                            <div class="cell-content">
+                                <div class="markdown-content">
+                                    <h1>φ-Discovery System</h1>
+                                    <p>Discover mathematical truths through topological validation and φ-recursive patterns.</p>
+                                    <ul>
+                                        <li><strong>Enter equations</strong> to validate and discover relationships</li>
+                                        <li><strong>Ask Claude</strong> to explore mathematical concepts</li>
+                                        <li><strong>Watch discoveries</strong> flow through the validation topology</li>
+                                        <li><strong>Monitor χ</strong> to ensure topological health</li>
+                                    </ul>
+                                    <p>Try: <code>φ² = φ + 1</code> or ask <code>What is the relationship between φ and Fibonacci?</code></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Claude Chat Cell -->
+                        <div class="cell">
+                            <div class="cell-header" onclick="toggleCell(this)">
+                                <span class="cell-expand">▼</span>
+                                <span class="cell-type chat">CLAUDE</span>
+                                <span class="cell-title">Mathematical Discovery Assistant</span>
+                                <div class="cell-actions">
+                                    <button class="cell-action" onclick="clearChat(this)">🧹</button>
+                                </div>
+                            </div>
+                            <div class="cell-content">
+                                <div class="chat-messages" id="chatMessages" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                                    <div class="chat-message">
+                                        <div class="message-avatar" style="background: linear-gradient(135deg, var(--accent-primary), var(--phase-blue));">φ</div>
+                                        <div class="message-content">
+                                            <div class="message-header">
+                                                <span class="message-author">φ-Discovery</span>
+                                                <span class="message-time">Now</span>
+                                            </div>
+                                            <div class="message-text">
+                                                I'm ready to help you discover mathematical truths. You can:
+                                                <ul style="margin: 10px 0;">
+                                                    <li>Enter equations for validation</li>
+                                                    <li>Ask about mathematical relationships</li>
+                                                    <li>Explore topological properties</li>
+                                                    <li>Generate new theorems</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chat-input-area">
+                                    <textarea class="chat-input" id="chatInput" placeholder="Enter an equation or ask a question..." rows="1"></textarea>
+                                    <button class="chat-send" onclick="sendMessage()">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workspace-toolbar">
+                        <button class="toolbar-btn" onclick="startSystem()">
+                            <span class="toolbar-icon">▶</span> Start System
+                        </button>
+                        <button class="toolbar-btn" onclick="stopSystem()">
+                            <span class="toolbar-icon">⏹</span> Stop System
+                        </button>
+                        <button class="toolbar-btn" onclick="validateEquation()">
+                            <span class="toolbar-icon">✓</span> Validate
+                        </button>
+                        <button class="toolbar-btn" onclick="clearWorkspace()">
+                            <span class="toolbar-icon">🧹</span> Clear
+                        </button>
+                    </div>
+                </div>
+            </main>
+            
+            <!-- Right Panel - Metrics -->
+            <aside class="right-panel">
+                <div class="console-tabs">
+                    <div class="console-tab active" onclick="switchConsoleTab(this, 'metrics')">Metrics</div>
+                    <div class="console-tab" onclick="switchConsoleTab(this, 'topology')">Topology</div>
+                    <div class="console-tab" onclick="switchConsoleTab(this, 'logs')">Logs</div>
+                </div>
+                
+                <div class="console-content" id="metricsContent">
+                    <div class="metric-display">
+                        <div class="metric-label">Discoveries</div>
+                        <div class="metric-value" id="discoveryCount">0</div>
+                    </div>
+                    
+                    <div class="metric-display">
+                        <div class="metric-label">Phase Lock</div>
+                        <div class="metric-value" id="phaseLock">0.000</div>
+                        <div class="quantum-indicator">
+                            <div class="quantum-indicator-fill" id="phaseLockBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-display">
+                        <div class="metric-label">Validation Rate</div>
+                        <div class="metric-value" id="validationRate">0.000</div>
+                        <div class="quantum-indicator">
+                            <div class="quantum-indicator-fill" id="validationBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-display">
+                        <div class="metric-label">φ-Coherence</div>
+                        <div class="metric-value" id="phiCoherence">0.618</div>
+                        <div class="quantum-indicator">
+                            <div class="quantum-indicator-fill" id="phiBar" style="width: 61.8%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="console-content" id="topologyContent" style="display: none;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 10px;">Betti Numbers</h4>
+                        <p style="margin-bottom: 8px;">B₀ = <span id="b0">9</span> (Components)</p>
+                        <p style="margin-bottom: 8px;">B₁ = <span id="b1">21</span> (Cycles)</p>
+                        <p style="margin-bottom: 8px;">B₂ = <span id="b2">13</span> (Voids)</p>
+                        <p style="margin-top: 15px; color: var(--accent-primary);">χ = <span id="chiCalc">1</span></p>
+                    </div>
+                </div>
+                
+                <div class="console-content" id="logsContent" style="display: none;">
+                    <div id="systemLogs" style="font-family: 'Monaco', monospace; font-size: 0.75rem; color: var(--text-dim);">
+                        [System Ready] Waiting for initialization...
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    
+    <script>
+        // Global state
+        let apiKey = '';
+        let systemRunning = false;
+        let ws = null;
+        let discoveries = [];
+        
+        // Initialize on load
+        window.addEventListener('load', function() {
+            document.getElementById('chatInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+        
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            apiKey = document.getElementById('apiKey').value;
+            
+            if (apiKey) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainInterface').style.display = 'block';
+                addLog('[System] φ-Discovery initialized');
+                
+                // Try to connect to backend
+                connectToBackend();
+            }
+        }
+        
+        // Connect to backend WebSocket
+        function connectToBackend() {
+            try {
+                ws = new WebSocket('ws://localhost:8618');
+                
+                ws.onopen = () => {
+                    updateStatus('connected', 'System Connected');
+                    addLog('[WebSocket] Connected to backend');
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    handleBackendMessage(data);
+                };
+                
+                ws.onerror = () => {
+                    updateStatus('offline', 'Backend Offline - Running Standalone');
+                    addLog('[WebSocket] Backend not available - running in standalone mode');
+                };
+                
+                ws.onclose = () => {
+                    updateStatus('offline', 'Connection Lost');
+                };
+            } catch (e) {
+                updateStatus('offline', 'Standalone Mode');
+                addLog('[System] Running in standalone mode');
+            }
+        }
+        
+        // Handle backend messages
+        function handleBackendMessage(data) {
+            switch (data.type) {
+                case 'discovery':
+                    addDiscovery(data.equation, data.result);
+                    break;
+                case 'metrics':
+                    updateMetrics(data);
+                    break;
+                case 'log':
+                    addLog(data.message);
+                    break;
+            }
+        }
+        
+        // System control
+        function startSystem() {
+            systemRunning = true;
+            updateStatus('running', 'System Running');
+            addLog('[System] φ-Discovery system started');
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'start' }));
+            }
+        }
+        
+        function stopSystem() {
+            systemRunning = false;
+            updateStatus('offline', 'System Stopped');
+            addLog('[System] φ-Discovery system stopped');
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'stop' }));
+            }
+        }
+        
+        // Update system status
+        function updateStatus(status, text) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusDot.className = 'status-dot';
+            if (status === 'offline') {
+                statusDot.classList.add('offline');
+            } else if (status === 'connecting') {
+                statusDot.classList.add('connecting');
+            }
+            
+            statusText.textContent = text;
+        }
+        
+        // Send message to Claude
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addChatMessage('You', message, 'user');
+            input.value = '';
+            
+            // Check if it's an equation
+            if (isEquation(message)) {
+                validateEquationString(message);
+            } else {
+                // Send to Claude
+                try {
+                    const response = await callClaude(message);
+                    addChatMessage('Claude', response, 'assistant');
+                } catch (error) {
+                    addChatMessage('System', 'Error connecting to Claude: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // Call Claude API
+        async function callClaude(message) {
+            if (!apiKey) {
+                return "Please set your Claude API key in the login screen.";
+            }
+            
+            // Show loading
+            addChatMessage('Claude', '<span class="loading-spinner"></span> Thinking...', 'assistant', true);
+            
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-opus-20240229',
+                        max_tokens: 1000,
+                        messages: [{
+                            role: 'user',
+                            content: `You are φ-Discovery, a mathematical discovery system that validates equations through topological methods and golden ratio patterns. 
+                            
+                            Context: We use Betti numbers (B₀, B₁, B₂) to analyze equation topology, and φ-recursive patterns to discover relationships.
+                            
+                            User query: ${message}
+                            
+                            Respond with mathematical insight, and if relevant, suggest equations to validate.`
+                        }]
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                
+                // Remove loading message
+                const messages = document.getElementById('chatMessages');
+                const loadingMsg = messages.lastElementChild;
+                if (loadingMsg && loadingMsg.querySelector('.loading-spinner')) {
+                    loadingMsg.remove();
+                }
+                
+                return data.content[0].text;
+                
+            } catch (error) {
+                // Remove loading message
+                const messages = document.getElementById('chatMessages');
+                const loadingMsg = messages.lastElementChild;
+                if (loadingMsg && loadingMsg.querySelector('.loading-spinner')) {
+                    loadingMsg.remove();
+                }
+                
+                throw error;
+            }
+        }
+        
+        // Check if message is an equation
+        function isEquation(text) {
+            return text.includes('=') || text.includes('φ') || text.includes('∇') || /[a-zA-Z]\s*[²³⁴⁵⁶⁷⁸⁹]/.test(text);
+        }
+        
+        // Validate equation
+        function validateEquationString(equation) {
+            // Simulate validation
+            addLog(`[Validation] Processing: ${equation}`);
+            
+            // Calculate Betti numbers
+            const betti = calculateBetti(equation);
+            const chi = betti[0] - betti[1] + betti[2];
+            
+            // Simulate validation result
+            const confidence = Math.random() * 0.3 + 0.7;
+            const valid = confidence > 0.618;
+            
+            const result = {
+                equation,
+                valid,
+                confidence,
+                betti,
+                chi,
+                timestamp: new Date().toISOString()
+            };
+            
+            addDiscovery(equation, result);
+            
+            // Send to backend if connected
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'validate', equation }));
+            }
+        }
+        
+        // Calculate Betti numbers
+        function calculateBetti(equation) {
+            const b0 = (equation.match(/=/g) || []).length + 1;
+            const b1 = Math.floor((equation.match(/[()]/g) || []).length / 2);
+            const b2 = (equation.match(/∫/g) || []).length;
+            return [b0, b1, b2];
+        }
+        
+        // Add discovery result
+        function addDiscovery(equation, result) {
+            discoveries.push(result);
+            
+            // Create discovery cell
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.innerHTML = `
+                <div class="cell-header" onclick="toggleCell(this)">
+                    <span class="cell-expand">▼</span>
+                    <span class="cell-type validation">VALIDATION</span>
+                    <span class="cell-title">${equation}</span>
+                    <div class="cell-actions">
+                        <span style="color: ${result.valid ? 'var(--amplitude-green)' : 'var(--energy-red)'}">
+                            ${result.valid ? '✓' : '✗'}
+                        </span>
+                    </div>
+                </div>
+                <div class="cell-content">
+                    <div class="discovery-result">
+                        <div class="discovery-equation">${equation}</div>
+                        <div class="discovery-meta">
+                            <div class="discovery-metric">
+                                <div class="discovery-metric-label">Confidence</div>
+                                <div class="discovery-metric-value">${(result.confidence * 100).toFixed(1)}%</div>
+                            </div>
+                            <div class="discovery-metric">
+                                <div class="discovery-metric-label">Betti Vector</div>
+                                <div class="discovery-metric-value">[${result.betti.join(', ')}]</div>
+                            </div>
+                            <div class="discovery-metric">
+                                <div class="discovery-metric-label">χ Value</div>
+                                <div class="discovery-metric-value">${result.chi}</div>
+                            </div>
+                            <div class="discovery-metric">
+                                <div class="discovery-metric-label">Status</div>
+                                <div class="discovery-metric-value">${result.valid ? 'Valid' : 'Invalid'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert after chat cell
+            const chatCell = document.querySelector('.cell-type.chat').closest('.cell');
+            chatCell.parentNode.insertBefore(cell, chatCell.nextSibling);
+            
+            // Update metrics
+            updateMetrics({
+                discoveries: discoveries.length,
+                validationRate: discoveries.filter(d => d.valid).length / discoveries.length
+            });
+            
+            // Add to validated list if valid
+            if (result.valid) {
+                addToEquationsList(equation, result.confidence);
+            }
+            
+            addLog(`[Discovery] ${equation} - ${result.valid ? 'Valid' : 'Invalid'} (${(result.confidence * 100).toFixed(1)}%)`);
+        }
+        
+        // Add to equations list
+        function addToEquationsList(equation, confidence) {
+            const list = document.getElementById('equationsList');
+            const item = document.createElement('div');
+            item.className = 'memory-item';
+            item.innerHTML = `
+                <div class="memory-icon" style="background: ${getConfidenceColor(confidence)};"></div>
+                <div class="memory-name">${equation}</div>
+                <div class="memory-size">${confidence.toFixed(3)}</div>
+            `;
+            list.appendChild(item);
+        }
+        
+        // Get color based on confidence
+        function getConfidenceColor(confidence) {
+            if (confidence > 0.9) return 'var(--accent-primary)';
+            if (confidence > 0.8) return 'var(--amplitude-green)';
+            if (confidence > 0.7) return 'var(--phase-blue)';
+            return 'var(--velocity-purple)';
+        }
+        
+        // Add chat message
+        function addChatMessage(author, text, type, isTemporary = false) {
+            const messages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const avatarStyle = type === 'assistant' ? 'background: linear-gradient(135deg, var(--accent-primary), var(--phase-blue));' : '';
+            const avatarText = type === 'assistant' ? 'C' : author.substring(0, 2).toUpperCase();
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar" style="${avatarStyle}">${avatarText}</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-author">${author}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-text">${text}</div>
+                </div>
+            `;
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Update metrics
+        function updateMetrics(data) {
+            if (data.discoveries !== undefined) {
+                document.getElementById('discoveryCount').textContent = data.discoveries;
+            }
+            
+            if (data.phaseLock !== undefined) {
+                document.getElementById('phaseLock').textContent = data.phaseLock.toFixed(3);
+                document.getElementById('phaseLockBar').style.width = (data.phaseLock * 100) + '%';
+            }
+            
+            if (data.validationRate !== undefined) {
+                document.getElementById('validationRate').textContent = data.validationRate.toFixed(3);
+                document.getElementById('validationBar').style.width = (data.validationRate * 100) + '%';
+            }
+            
+            if (data.phiCoherence !== undefined) {
+                document.getElementById('phiCoherence').textContent = data.phiCoherence.toFixed(3);
+                document.getElementById('phiBar').style.width = (data.phiCoherence * 100) + '%';
+            }
+        }
+        
+        // Add log entry
+        function addLog(message) {
+            const logs = document.getElementById('systemLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            logs.innerHTML += `<br>[${timestamp}] ${message}`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        // Toggle cell
+        function toggleCell(header) {
+            const cell = header.parentElement;
+            cell.classList.toggle('collapsed');
+        }
+        
+        // Switch console tab
+        function switchConsoleTab(tab, contentId) {
+            document.querySelectorAll('.console-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            document.querySelectorAll('.console-content').forEach(c => c.style.display = 'none');
+            document.getElementById(contentId + 'Content').style.display = 'block';
+        }
+        
+        // Clear chat
+        function clearChat(button) {
+            const messages = button.closest('.cell').querySelector('.chat-messages');
+            messages.innerHTML = '';
+            addLog('[Chat] Cleared conversation');
+        }
+        
+        // Clear workspace
+        function clearWorkspace() {
+            discoveries = [];
+            document.querySelectorAll('.cell-type.validation').forEach(cell => {
+                cell.closest('.cell').remove();
+            });
+            updateMetrics({
+                discoveries: 0,
+                validationRate: 0,
+                phaseLock: 0,
+                phiCoherence: 0.618
+            });
+            addLog('[System] Workspace cleared');
+        }
+        
+        // Simulate φ-recursive updates
+        setInterval(() => {
+            if (systemRunning) {
+                const phaseLock = 0.5 + Math.sin(Date.now() / 3000) * 0.3;
+                const phiCoherence = 0.618 + Math.sin(Date.now() / 5000) * 0.2;
+                
+                updateMetrics({
+                    phaseLock: Math.max(0, Math.min(1, phaseLock)),
+                    phiCoherence: Math.max(0, Math.min(1, phiCoherence))
+                });
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

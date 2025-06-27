@@ -1,0 +1,14 @@
+# Discovery node image
+FROM mcp-phi-base:latest
+
+# Discovery-specific environment
+ENV MCP_ROLE=discovery \
+    FIBONACCI_TIMING=true \
+    PATTERN_CACHE=/cache/patterns \
+    CASCADE_DEPTH=21
+
+# Copy discovery-specific scripts
+COPY scripts/discovery-node.js /app/scripts/
+
+# Override command for discovery mode
+CMD ["node", "/app/scripts/discovery-node.js"]

@@ -1,0 +1,142 @@
+{
+  "timestamp": "2025-06-27T00:39:25.295Z",
+  "overallHealth": "WARNING",
+  "services": [
+    {
+      "id": "docker",
+      "status": "healthy",
+      "message": "Docker Docker version 27.4.0, build bde2b89",
+      "details": {
+        "serverVersion": ""
+      },
+      "timestamp": "2025-06-27T00:39:25.234Z",
+      "checkId": "docker",
+      "name": "Docker Engine",
+      "critical": true
+    },
+    {
+      "id": "swarm",
+      "status": "warning",
+      "message": "Swarm ",
+      "details": {
+        "state": ""
+      },
+      "timestamp": "2025-06-27T00:39:25.244Z",
+      "checkId": "swarm",
+      "name": "Docker Swarm",
+      "critical": false
+    },
+    {
+      "id": "web",
+      "status": "healthy",
+      "message": "Web interface responding",
+      "details": {
+        "statusCode": 200,
+        "timestamp": "2025-06-27T00:39:25.250Z"
+      },
+      "timestamp": "2025-06-27T00:39:25.252Z",
+      "checkId": "web",
+      "name": "Web Interface",
+      "critical": true
+    },
+    {
+      "id": "mcp",
+      "status": "healthy",
+      "message": "MCP WebSocket responding",
+      "details": {
+        "connected": true
+      },
+      "timestamp": "2025-06-27T00:39:25.254Z",
+      "checkId": "mcp",
+      "name": "MCP Server",
+      "critical": true
+    },
+    {
+      "id": "postgres",
+      "status": "warning",
+      "message": "PostgreSQL check failed",
+      "details": {
+        "error": "Command failed: docker ps --filter name=postgres --format \"{{.Names}}\"\nCannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n"
+      },
+      "timestamp": "2025-06-27T00:39:25.263Z",
+      "checkId": "postgres",
+      "name": "PostgreSQL",
+      "critical": false
+    },
+    {
+      "id": "redis",
+      "status": "warning",
+      "message": "Redis check failed",
+      "details": {
+        "error": "Command failed: docker ps --filter name=redis --format \"{{.Names}}\"\nCannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n"
+      },
+      "timestamp": "2025-06-27T00:39:25.272Z",
+      "checkId": "redis",
+      "name": "Redis",
+      "critical": false
+    },
+    {
+      "id": "rabbitmq",
+      "status": "warning",
+      "message": "RabbitMQ check failed",
+      "details": {
+        "error": "Command failed: docker ps --filter name=rabbitmq --format \"{{.Names}}\"\nCannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n"
+      },
+      "timestamp": "2025-06-27T00:39:25.280Z",
+      "checkId": "rabbitmq",
+      "name": "RabbitMQ",
+      "critical": false
+    },
+    {
+      "id": "workers",
+      "status": "warning",
+      "message": "No discovery stack deployed",
+      "details": {
+        "deployed": false
+      },
+      "timestamp": "2025-06-27T00:39:25.289Z",
+      "checkId": "workers",
+      "name": "Discovery Workers",
+      "critical": false
+    },
+    {
+      "id": "filesystem",
+      "status": "healthy",
+      "message": "All required files present",
+      "details": {
+        "checked": 5
+      },
+      "timestamp": "2025-06-27T00:39:25.290Z",
+      "checkId": "filesystem",
+      "name": "File System",
+      "critical": true
+    },
+    {
+      "id": "resources",
+      "status": "healthy",
+      "message": "Disk: 71% used, Memory: N/A",
+      "details": {
+        "diskUsed": 71,
+        "memory": "N/A",
+        "diskInfo": [
+          "C:\\",
+          "3.8T",
+          "2.7T",
+          "1.1T",
+          "71%",
+          "/mnt/c"
+        ]
+      },
+      "timestamp": "2025-06-27T00:39:25.295Z",
+      "checkId": "resources",
+      "name": "System Resources",
+      "critical": false
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "healthy": 5,
+    "warning": 5,
+    "unhealthy": 0
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-06-27T00:29:36.427Z",
+  "results": {
+    "total": 34,
+    "passed": 31,
+    "failed": 3,
+    "skipped": 0,
+    "categories": {
+      "filesystem": {
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      "dependencies": {
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      "docker": {
+        "passed": 2,
+        "failed": 2,
+        "skipped": 0
+      },
+      "python": {
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "mathematics": {
+        "passed": 2,
+        "failed": 1,
+        "skipped": 0
+      },
+      "web": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "mcp": {
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "integration": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "performance": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "security": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "passRate": 91.2,
+  "recommendations": [
+    "Fix Docker setup - ensure Docker is installed and running"
+  ]
+}

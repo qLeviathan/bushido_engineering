@@ -1,0 +1,6 @@
+# Python launcher requirements
+tkinter  # Usually comes with Python
+pathlib  # Built-in
+webbrowser  # Built-in
+subprocess  # Built-in
+threading  # Built-in

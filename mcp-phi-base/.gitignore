@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+target/
+Cargo.lock
+
+# Build outputs
+dist/
+build/
+*.wasm
+
+# Logs
+logs/
+*.log
+validation-chain.json
+
+# Environment
+.env
+.env.local
+.env.*
+!.env.example
+swarm-tokens.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+data/
+cache/
+equation_corpus/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Security
+*.pem
+*.key
+*.crt
+docker-compose.override.yml

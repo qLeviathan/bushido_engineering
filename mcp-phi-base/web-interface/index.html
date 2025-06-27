@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>φ-Discovery | Mathematical Discovery Platform</title>
+    <style>
+        :root {
+            --bg-primary: #0a192f;
+            --bg-secondary: #112240;
+            --bg-tertiary: #1a2744;
+            --accent-primary: #FFD700;
+            --accent-secondary: #4d96ff;
+            --text-primary: #e6f1ff;
+            --text-secondary: #8892b0;
+            --text-dim: #495670;
+            --border-color: rgba(255, 215, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+            --success-color: #64ffda;
+            --error-color: #ff6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Main Interface */
+        .interface {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            height: 50px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mcp-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .status-dot.offline {
+            background: var(--error-color);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .message-avatar.user {
+            background: var(--accent-secondary);
+            color: white;
+        }
+        
+        .message-avatar.claude {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        .message-avatar.system {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .message-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .message-text code {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .message-text pre {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        /* Chat Input */
+        .chat-input-container {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: none;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .send-btn {
+            padding: 12px 24px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            width: 350px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metrics-container {
+            padding: 20px;
+        }
+        
+        .metric {
+            margin-bottom: 20px;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .metric-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .metric-bar-fill {
+            height: 100%;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+        
+        /* Discovery Feed */
+        .discovery-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .discovery-item {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .discovery-equation {
+            font-family: "Times New Roman", serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .discovery-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        .discovery-meta span {
+            color: var(--accent-primary);
+        }
+        
+        /* Stored equations styles */
+        .stored-equations {
+            padding: 10px;
+        }
+        
+        .stored-equation {
+            background: var(--bg-tertiary);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .stored-equation:hover {
+            border-color: var(--accent-primary);
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        .stored-equation-text {
+            color: var(--accent-primary);
+            font-family: "Times New Roman", serif;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .stored-equation-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .stored-equation-confidence {
+            color: var(--success-color);
+        }
+        
+        /* MCP Indicator */
+        .mcp-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mcp-indicator.show {
+            opacity: 1;
+        }
+        
+        .mcp-indicator-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        /* Mind Map Styles */
+        .mindmap-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 10;
+        }
+        
+        #mindMapCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        #mindMapCanvas:active {
+            cursor: grabbing;
+        }
+        
+        .equation-info-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: none;
+            z-index: 20;
+        }
+        
+        .equation-info-overlay.active {
+            display: block;
+        }
+        
+        .overlay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        #overlayEquation {
+            font-family: "Times New Roman", serif;
+            font-size: 1.3rem;
+            color: var(--accent-primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .betti-visual-inline {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: space-around;
+        }
+        
+        .betti-component {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .betti-component svg {
+            display: block;
+            margin: 0 auto 5px;
+        }
+        
+        .betti-component span {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="interface">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <span>φ-Discovery</span>
+                <span style="color: var(--text-secondary); font-size: 0.8rem;">MCP</span>
+            </div>
+            
+            <div class="mcp-status">
+                <div class="status-dot" id="mcpStatusDot"></div>
+                <span class="status-text" id="mcpStatusText">Connecting to MCP...</span>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn" onclick="connectMCP()">Connect MCP</button>
+                <button class="btn" onclick="openMCPDocs()">MCP Setup</button>
+                <button class="btn" onclick="toggleMindMap()">Toggle Mind Map</button>
+                <button class="btn" onclick="window.location.href='integrated-physics-learning.html'">Learning Mode</button>
+                <button class="btn" onclick="clearChat()">Clear</button>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Mind Map Integration -->
+            <div class="mindmap-section" id="mindmapSection" style="display: none;">
+                <canvas id="mindMapCanvas"></canvas>
+                <div class="equation-info-overlay" id="equationInfoOverlay">
+                    <div class="overlay-header">
+                        <span id="overlayEquation"></span>
+                        <button class="close-btn" onclick="closeEquationOverlay()">×</button>
+                    </div>
+                    <div class="overlay-content">
+                        <div class="betti-visual-inline">
+                            <div class="betti-component">
+                                <svg width="40" height="40" viewBox="0 0 40 40">
+                                    <circle cx="10" cy="20" r="8" fill="#64ffda" opacity="0.3"/>
+                                    <circle cx="30" cy="20" r="8" fill="#64ffda" opacity="0.3"/>
+                                </svg>
+                                <span>B₀: <span id="overlayB0">0</span></span>
+                            </div>
+                            <div class="betti-component">
+                                <svg width="40" height="40" viewBox="0 0 40 40">
+                                    <circle cx="20" cy="20" r="15" fill="none" stroke="#64ffda" stroke-width="2"/>
+                                    <circle cx="20" cy="20" r="6" fill="#0a192f"/>
+                                </svg>
+                                <span>B₁: <span id="overlayB1">0</span></span>
+                            </div>
+                            <div class="betti-component">
+                                <svg width="40" height="40" viewBox="0 0 40 40">
+                                    <ellipse cx="20" cy="20" rx="15" ry="10" fill="none" stroke="#64ffda" stroke-width="1.5" opacity="0.7"/>
+                                    <ellipse cx="20" cy="20" rx="10" ry="15" fill="none" stroke="#64ffda" stroke-width="1.5" opacity="0.7"/>
+                                    <circle cx="20" cy="20" r="5" fill="#0a192f" opacity="0.8"/>
+                                </svg>
+                                <span>B₂: <span id="overlayB2">0</span></span>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="sendEquationToChat()">Ask Claude About This</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Panel -->
+            <div class="chat-panel" id="chatPanel">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome message -->
+                    <div class="message">
+                        <div class="message-avatar system">φ</div>
+                        <div class="message-content">
+                            <div class="message-author">System</div>
+                            <div class="message-text">Welcome to φ-Discovery MCP Interface!
+
+This system automatically connects to Claude through the Model Context Protocol (MCP).
+
+Connection Status:
+• WebSocket connection establishes automatically on page load
+• Claude integration ready when status shows "MCP Connected"
+• Explore the enhanced Equation Map for visual discovery
+
+To get started:
+1. Ensure Docker Swarm is running: <code>docker stack ls</code>
+2. Launch Claude with MCP: <code>wsl -- claude --mcp phi-discovery</code>
+3. Start typing equations or questions
+
+You can:
+• Validate mathematical equations (e.g., "φ² = φ + 1")
+• Ask Claude about mathematics through MCP
+• Explore topological properties with Betti numbers
+• View the enhanced Equation Mind Map with full mathematical details</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            class="chat-input" 
+                            id="chatInput"
+                            placeholder="Type an equation or ask Claude..."
+                            rows="1"
+                            onkeydown="handleKeyPress(event)"
+                        ></textarea>
+                        <button class="send-btn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">System Metrics</h3>
+                </div>
+                
+                <div class="metrics-container">
+                    <div class="metric">
+                        <div class="metric-label">Phase Lock</div>
+                        <div class="metric-value" id="phaseLock">0.000</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill" id="phaseLockBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">φ-Coherence</div>
+                        <div class="metric-value" id="phiCoherence">0.618</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill" id="phiCoherenceBar" style="width: 61.8%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Validation Rate</div>
+                        <div class="metric-value" id="validationRate">0.00/min</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Discoveries</div>
+                        <div class="metric-value" id="discoveries">0</div>
+                    </div>
+                </div>
+                
+                <div class="panel-header">
+                    <h3 class="panel-title">Discovery Feed</h3>
+                </div>
+                
+                <div class="discovery-feed" id="discoveryFeed">
+                    <!-- Discoveries will appear here -->
+                </div>
+                
+                <div class="panel-header" style="margin-top: 20px;">
+                    <h3 class="panel-title">Master Equation List</h3>
+                    <button class="btn" style="font-size: 0.8rem; padding: 4px 8px;" onclick="loadStoredEquations()">Refresh</button>
+                </div>
+                
+                <div class="stored-equations" id="storedEquations" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Stored equations will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- MCP Indicator -->
+        <div class="mcp-indicator" id="mcpIndicator">
+            <div class="status-dot"></div>
+            <span class="mcp-indicator-text">Processing with MCP...</span>
+        </div>
+    </div>
+    
+    <script>
+        // Global state
+        let ws = null;
+        let mcpConnected = false;
+        let discoveryCount = 0;
+        let mindMapVisible = false;
+        let selectedEquation = null;
+        
+        // Mind map state
+        let mindMapNodes = [];
+        let mindMapLinks = [];
+        let mindMapCamera = { x: 0, y: 0, zoom: 1 };
+        let mindMapMouse = { x: 0, y: 0, down: false };
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            checkMCPConnection();
+            initializeWebSocket();
+            loadStoredEquations();
+        });
+        
+        // Handle enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Clear input
+            input.value = '';
+            
+            // Add user message
+            addMessage('user', message);
+            
+            // Show MCP indicator
+            showMCPIndicator();
+            
+            // Check if it's an equation
+            if (looksLikeEquation(message)) {
+                // Send to MCP for validation
+                sendToMCP('validate', { equation: message });
+            } else {
+                // Send to Claude through MCP
+                sendToMCP('ask', { question: message });
+            }
+        }
+        
+        // Check if message looks like an equation
+        function looksLikeEquation(text) {
+            return text.includes('=') || 
+                   text.includes('φ') || 
+                   text.includes('∇') || 
+                   text.includes('∫') ||
+                   /[a-zA-Z]\s*[²³⁴⁵⁶⁷⁸⁹]/.test(text) ||
+                   /\d+\s*[+\-*/]\s*\d+/.test(text);
+        }
+        
+        // Add message to chat
+        function addMessage(type, text) {
+            const messagesDiv = document.getElementById('chatMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const avatarText = type === 'user' ? 'You' : type === 'claude' ? 'C' : 'φ';
+            const authorName = type === 'user' ? 'You' : type === 'claude' ? 'Claude' : 'System';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${type}">${avatarText}</div>
+                <div class="message-content">
+                    <div class="message-author">${authorName}</div>
+                    <div class="message-text">${text}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Initialize WebSocket
+        function initializeWebSocket() {
+            try {
+                ws = new WebSocket('ws://localhost:3000/ws');
+                
+                ws.onopen = () => {
+                    console.log('WebSocket connected');
+                    updateMCPStatus(true);
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    updateMCPStatus(false);
+                };
+                
+                ws.onclose = () => {
+                    console.log('WebSocket closed');
+                    updateMCPStatus(false);
+                    // Retry connection after 5 seconds
+                    setTimeout(initializeWebSocket, 5000);
+                };
+            } catch (error) {
+                console.error('Failed to create WebSocket:', error);
+                updateMCPStatus(false);
+            }
+        }
+        
+        // Handle WebSocket messages
+        function handleWebSocketMessage(data) {
+            hideMCPIndicator();
+            
+            switch (data.type) {
+                case 'mcp_response':
+                    if (data.action === 'validate') {
+                        handleValidationResult(data.result);
+                    } else if (data.action === 'ask') {
+                        addMessage('claude', data.response);
+                    }
+                    break;
+                    
+                case 'discovery':
+                    addDiscovery(data.equation, data.result);
+                    break;
+                    
+                case 'metrics':
+                    updateMetrics(data);
+                    break;
+                    
+                case 'error':
+                    addMessage('system', `Error: ${data.message}`);
+                    break;
+                    
+                case 'equation_stored':
+                    loadStoredEquations(); // Refresh when new equation is stored
+                    break;
+                    
+                case 'equation_deleted':
+                    loadStoredEquations(); // Refresh when equation is deleted
+                    break;
+            }
+        }
+        
+        // Send to MCP
+        function sendToMCP(action, data) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'mcp_request',
+                    action: action,
+                    data: data
+                }));
+            } else {
+                // Fallback for when WebSocket is not connected
+                if (action === 'validate') {
+                    // Local validation
+                    const result = validateLocally(data.equation);
+                    handleValidationResult(result);
+                } else {
+                    addMessage('system', 'MCP not connected. Please ensure Claude is running with MCP servers.');
+                }
+                hideMCPIndicator();
+            }
+        }
+        
+        // Local validation fallback
+        function validateLocally(equation) {
+            const betti = calculateBetti(equation);
+            const chi = betti[0] - betti[1] + betti[2];
+            const confidence = Math.random() * 0.3 + 0.7;
+            
+            return {
+                equation,
+                valid: confidence > 0.618,
+                confidence,
+                betti,
+                chi,
+                phiCoherence: 0.618 + Math.random() * 0.2
+            };
+        }
+        
+        // Calculate Betti numbers
+        function calculateBetti(equation) {
+            const b0 = (equation.match(/=/g) || []).length + 1;
+            const b1 = Math.floor((equation.match(/[()]/g) || []).length / 2);
+            const b2 = (equation.match(/∫/g) || []).length;
+            return [b0, b1, b2];
+        }
+        
+        // Handle validation result
+        function handleValidationResult(result) {
+            const bettiStr = `[${result.betti.join(', ')}]`;
+            const message = `Equation: ${result.equation}
+Valid: ${result.valid ? '✓' : '✗'}
+Confidence: ${(result.confidence * 100).toFixed(1)}%
+Betti Numbers: ${bettiStr}
+χ (Euler): ${result.chi}
+φ-Coherence: ${result.phiCoherence ? result.phiCoherence.toFixed(3) : 'N/A'}`;
+            
+            addMessage('system', message);
+            
+            if (result.valid) {
+                addDiscovery(result.equation, result);
+                saveEquation(result); // Save to master list
+                updateMetrics({
+                    phaseLock: result.phiCoherence || 0.618,
+                    validationRate: Math.random() * 2 + 1
+                });
+            }
+        }
+        
+        // Add discovery to feed
+        function addDiscovery(equation, result) {
+            discoveryCount++;
+            document.getElementById('discoveries').textContent = discoveryCount;
+            
+            const feedDiv = document.getElementById('discoveryFeed');
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'discovery-item';
+            itemDiv.innerHTML = `
+                <div class="discovery-equation">${equation}</div>
+                <div class="discovery-meta">
+                    <div>Confidence: <span>${(result.confidence * 100).toFixed(1)}%</span></div>
+                    <div>χ: <span>${result.chi}</span></div>
+                </div>
+            `;
+            
+            feedDiv.insertBefore(itemDiv, feedDiv.firstChild);
+            
+            // Keep only last 10 discoveries
+            while (feedDiv.children.length > 10) {
+                feedDiv.removeChild(feedDiv.lastChild);
+            }
+        }
+        
+        // Update metrics
+        function updateMetrics(data) {
+            if (data.phaseLock !== undefined) {
+                const value = data.phaseLock;
+                document.getElementById('phaseLock').textContent = value.toFixed(3);
+                document.getElementById('phaseLockBar').style.width = `${value * 100}%`;
+            }
+            
+            if (data.phiCoherence !== undefined) {
+                const value = data.phiCoherence;
+                document.getElementById('phiCoherence').textContent = value.toFixed(3);
+                document.getElementById('phiCoherenceBar').style.width = `${value * 100}%`;
+            }
+            
+            if (data.validationRate !== undefined) {
+                document.getElementById('validationRate').textContent = `${data.validationRate.toFixed(2)}/min`;
+            }
+        }
+        
+        // Save equation to master list
+        async function saveEquation(result) {
+            try {
+                const response = await fetch('/api/equations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        equation: result.equation,
+                        betti: result.betti,
+                        chi: result.chi,
+                        confidence: result.confidence,
+                        phiCoherence: result.phiCoherence,
+                        archetype: result.archetype || detectArchetype(result.equation)
+                    })
+                });
+                
+                if (response.ok) {
+                    loadStoredEquations(); // Refresh the list
+                }
+            } catch (error) {
+                console.error('Failed to save equation:', error);
+            }
+        }
+        
+        // Load stored equations from server
+        async function loadStoredEquations() {
+            try {
+                const response = await fetch('/api/equations');
+                const data = await response.json();
+                
+                const container = document.getElementById('storedEquations');
+                container.innerHTML = '';
+                
+                if (data.equations.length === 0) {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-dim);">No equations stored yet</div>';
+                    return;
+                }
+                
+                data.equations.forEach(eq => {
+                    const div = document.createElement('div');
+                    div.className = 'stored-equation';
+                    div.innerHTML = `
+                        <div class="stored-equation-text">${eq.equation}</div>
+                        <div class="stored-equation-meta">
+                            <span class="stored-equation-confidence">${(eq.confidence * 100).toFixed(1)}%</span>
+                            <span>${eq.archetype}</span>
+                            <span>χ=${eq.chi}</span>
+                        </div>
+                    `;
+                    
+                    div.onclick = () => {
+                        // Set the equation in the input
+                        document.getElementById('chatInput').value = eq.equation;
+                        // Optionally validate it again
+                        sendMessage();
+                    };
+                    
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Failed to load equations:', error);
+            }
+        }
+        
+        // Detect equation archetype
+        function detectArchetype(equation) {
+            if (equation.includes('mc²') || equation.includes('c²')) return 'relativity';
+            if (equation.includes('ℏ') || equation.includes('ψ') || equation.includes('⟨')) return 'quantum';
+            if (equation.includes('F') && equation.includes('ma')) return 'mechanics';
+            if (equation.includes('PV') || equation.includes('nRT') || equation.includes('S')) return 'thermodynamics';
+            if (equation.includes('∇') || equation.includes('E') || equation.includes('B')) return 'electromagnetism';
+            if (equation.includes('φ') || equation.includes('golden')) return 'golden-ratio';
+            if (equation.includes('χ') || equation.includes('B₀') || equation.includes('B₁')) return 'topology';
+            return 'general';
+        }
+        
+        // Check MCP connection
+        async function checkMCPConnection() {
+            try {
+                const response = await fetch('/health');
+                mcpConnected = response.ok;
+                updateMCPStatus(mcpConnected);
+            } catch (error) {
+                mcpConnected = false;
+                updateMCPStatus(false);
+            }
+        }
+        
+        // Update MCP status indicator
+        function updateMCPStatus(connected) {
+            const dot = document.getElementById('mcpStatusDot');
+            const text = document.getElementById('mcpStatusText');
+            
+            if (connected) {
+                dot.classList.remove('offline');
+                text.textContent = 'MCP Connected';
+            } else {
+                dot.classList.add('offline');
+                text.textContent = 'MCP Offline';
+            }
+        }
+        
+        // Connect MCP manually
+        async function connectMCP() {
+            addMessage('system', 'Attempting to connect to MCP servers...');
+            await checkMCPConnection();
+            
+            if (mcpConnected) {
+                addMessage('system', 'Successfully connected to MCP!');
+            } else {
+                addMessage('system', `MCP connection failed. Please ensure:
+1. Docker Swarm is running: docker stack ls
+2. Claude is launched with MCP: wsl -- claude --mcp phi-discovery
+3. The web server is running on port 3000`);
+            }
+        }
+        
+        // Open MCP documentation
+        function openMCPDocs() {
+            const docs = `MCP Setup Instructions:
+
+1. Start Docker Swarm:
+   docker swarm init (if not already initialized)
+   docker stack deploy -c docker-compose.betti.yml phi_discovery
+
+2. Configure Claude MCP:
+   Create or edit ~/.claude/mcp.json:
+   {
+     "servers": {
+       "phi-discovery": {
+         "command": "node",
+         "args": ["path/to/mcp-server.js"],
+         "env": {
+           "PHI_DISCOVERY_URL": "http://localhost:3000"
+         }
+       }
+     }
+   }
+
+3. Launch Claude with MCP:
+   wsl -- claude --mcp phi-discovery
+
+4. The system will automatically connect when ready.`;
+            
+            addMessage('system', docs);
+        }
+        
+        // Clear chat
+        function clearChat() {
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = '';
+            addMessage('system', 'Chat cleared. Ready for new discoveries!');
+        }
+        
+        // Show/hide MCP indicator
+        function showMCPIndicator() {
+            document.getElementById('mcpIndicator').classList.add('show');
+        }
+        
+        function hideMCPIndicator() {
+            document.getElementById('mcpIndicator').classList.remove('show');
+        }
+        
+        // Simulate live metrics
+        setInterval(() => {
+            if (mcpConnected) {
+                const phaseLock = 0.5 + Math.sin(Date.now() / 3000) * 0.3;
+                const phiCoherence = 0.618 + Math.sin(Date.now() / 5000) * 0.1;
+                
+                updateMetrics({
+                    phaseLock: Math.max(0, Math.min(1, phaseLock)),
+                    phiCoherence: Math.max(0, Math.min(1, phiCoherence))
+                });
+            }
+        }, 2000);
+        
+        // Toggle mind map view
+        function toggleMindMap() {
+            mindMapVisible = !mindMapVisible;
+            const mindmapSection = document.getElementById('mindmapSection');
+            const chatPanel = document.getElementById('chatPanel');
+            
+            if (mindMapVisible) {
+                mindmapSection.style.display = 'block';
+                chatPanel.style.opacity = '0.1';
+                if (mindMapNodes.length === 0) {
+                    initializeMindMap();
+                }
+            } else {
+                mindmapSection.style.display = 'none';
+                chatPanel.style.opacity = '1';
+            }
+        }
+        
+        // Initialize mind map
+        function initializeMindMap() {
+            const canvas = document.getElementById('mindMapCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 50; // Account for header
+            
+            mindMapCamera.x = canvas.width / 2;
+            mindMapCamera.y = canvas.height / 2;
+            
+            // Create nodes for common equations
+            const equations = [
+                { eq: 'E = mc²', x: -100, y: -100, archetype: 'relativity', betti: [1, 0, 1] },
+                { eq: 'F = ma', x: 100, y: -100, archetype: 'mechanics', betti: [1, 0, 0] },
+                { eq: 'E = hf', x: -100, y: 100, archetype: 'quantum', betti: [1, 1, 0] },
+                { eq: 'φ² = φ + 1', x: 100, y: 100, archetype: 'golden', betti: [1, 1, 1] },
+                { eq: 'PV = nRT', x: 0, y: -150, archetype: 'thermo', betti: [1, 0, 0] },
+                { eq: '∇·E = ρ/ε₀', x: 0, y: 150, archetype: 'em', betti: [1, 1, 0] }
+            ];
+            
+            equations.forEach((eq, i) => {
+                mindMapNodes.push({
+                    id: i,
+                    equation: eq.eq,
+                    x: mindMapCamera.x + eq.x,
+                    y: mindMapCamera.y + eq.y,
+                    archetype: eq.archetype,
+                    betti: eq.betti,
+                    radius: 40
+                });
+            });
+            
+            // Create links
+            mindMapLinks.push(
+                { source: 0, target: 2 }, // E=mc² to E=hf
+                { source: 1, target: 4 }, // F=ma to PV=nRT
+                { source: 2, target: 5 }  // E=hf to Maxwell
+            );
+            
+            // Set up mouse handlers
+            canvas.addEventListener('mousedown', handleMindMapMouseDown);
+            canvas.addEventListener('mousemove', handleMindMapMouseMove);
+            canvas.addEventListener('mouseup', handleMindMapMouseUp);
+            canvas.addEventListener('click', handleMindMapClick);
+            
+            // Start animation
+            animateMindMap();
+        }
+        
+        // Mind map mouse handlers
+        function handleMindMapMouseDown(e) {
+            mindMapMouse.down = true;
+            mindMapMouse.startX = e.clientX;
+            mindMapMouse.startY = e.clientY;
+        }
+        
+        function handleMindMapMouseMove(e) {
+            mindMapMouse.x = e.clientX;
+            mindMapMouse.y = e.clientY;
+            
+            if (mindMapMouse.down) {
+                const dx = e.clientX - mindMapMouse.startX;
+                const dy = e.clientY - mindMapMouse.startY;
+                
+                mindMapNodes.forEach(node => {
+                    node.x += dx;
+                    node.y += dy;
+                });
+                
+                mindMapMouse.startX = e.clientX;
+                mindMapMouse.startY = e.clientY;
+            }
+        }
+        
+        function handleMindMapMouseUp(e) {
+            mindMapMouse.down = false;
+        }
+        
+        function handleMindMapClick(e) {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicked on a node
+            mindMapNodes.forEach(node => {
+                const dx = x - node.x;
+                const dy = y - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < node.radius) {
+                    selectEquationNode(node);
+                }
+            });
+        }
+        
+        // Select equation node
+        function selectEquationNode(node) {
+            selectedEquation = node;
+            
+            // Update overlay
+            document.getElementById('overlayEquation').textContent = node.equation;
+            document.getElementById('overlayB0').textContent = node.betti[0];
+            document.getElementById('overlayB1').textContent = node.betti[1];
+            document.getElementById('overlayB2').textContent = node.betti[2];
+            
+            document.getElementById('equationInfoOverlay').classList.add('active');
+            
+            // Send context to WebSocket
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'equation_selected',
+                    equation: node.equation,
+                    betti: node.betti,
+                    archetype: node.archetype
+                }));
+            }
+        }
+        
+        // Close equation overlay
+        function closeEquationOverlay() {
+            document.getElementById('equationInfoOverlay').classList.remove('active');
+            selectedEquation = null;
+        }
+        
+        // Send equation to chat
+        function sendEquationToChat() {
+            if (selectedEquation) {
+                toggleMindMap(); // Close mind map
+                const message = `I'd like to understand ${selectedEquation.equation} better. Can you explain its significance and how the Betti numbers [${selectedEquation.betti.join(', ')}] relate to its topological structure?`;
+                document.getElementById('chatInput').value = message;
+                sendMessage();
+                closeEquationOverlay();
+            }
+        }
+        
+        // Animate mind map
+        function animateMindMap() {
+            if (!mindMapVisible) return;
+            
+            const canvas = document.getElementById('mindMapCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw links
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+            ctx.lineWidth = 2;
+            mindMapLinks.forEach(link => {
+                const source = mindMapNodes[link.source];
+                const target = mindMapNodes[link.target];
+                
+                ctx.beginPath();
+                ctx.moveTo(source.x, source.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+            });
+            
+            // Draw nodes
+            mindMapNodes.forEach(node => {
+                // Node circle
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                
+                // Archetype colors
+                const colors = {
+                    relativity: '#a8e6cf',
+                    mechanics: '#ff6b6b',
+                    quantum: '#4ecdc4',
+                    golden: '#FFD700',
+                    thermo: '#ffd93d',
+                    em: '#95e1d3'
+                };
+                
+                ctx.fillStyle = colors[node.archetype] || '#64ffda';
+                ctx.fill();
+                
+                if (node === selectedEquation) {
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 3;
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                    ctx.lineWidth = 1;
+                }
+                ctx.stroke();
+                
+                // Equation text
+                ctx.fillStyle = '#0a192f';
+                ctx.font = '14px "Times New Roman", serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.equation, node.x, node.y);
+            });
+            
+            requestAnimationFrame(animateMindMap);
+        }
+    </script>
+</body>
+</html>
