@@ -1,3 +1,5 @@
+**IMPORTANT** AI Test run
+
 # Bushido Engineering: A Reproducible Methodology for Mathematical Discovery
 
 *A First-Person Method for φ-Consciousness Activation and Breakthrough Research*
